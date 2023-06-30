@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[x-cloak] {
+    display: none;
+}
+
+
+
+.sksu-primary{
+    background: #1c753a;
+}
+.sksu-font{
+    color: #1c753a;
+}
