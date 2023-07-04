@@ -1,5 +1,5 @@
-<nav class="flex-auto w-96 flex-12 navigation bg-[#118A01] h-full" >
-    <div class="bg-cover  min-h-[100vh] nav-bg" >
+<nav class="flex-auto w-96 flex-12 navigation  bg-[#118A01] "  >
+    <div class="bg-cover  min-h-[100vh]  nav-bg"  style="height:100%">
 
         <div class="p-6 ">
             

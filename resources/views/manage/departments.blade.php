@@ -8,7 +8,7 @@
     <section class="flex h-full min-h-[100vh]">
         <x-navigation></x-navigation>
        
-        <x-content>Departments</x-content>
+        <x-content> @livewire('manage.department')</x-content>
 
     </section>
 
