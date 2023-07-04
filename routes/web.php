@@ -22,12 +22,19 @@ Route::prefix('attendance')->name('attedance.')->group(function(){
     Route::get('/', [AttendanceController::class, 'index'])->name('index');
 });
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified'
-])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+
+
+
+
+Route::middleware([ 'auth:sanctum',  config('jetstream.auth_session'), 'verified'])->group(function () {
+    
+    Route::get('/dashboard', function () {  return view('dashboard');  })->name('dashboard');
+    Route::get('/reports', function () {  return view('reports');  })->name('reports');
+    Route::name('manage.')->group(function(){
+        Route::get('/manage-department', function () {  return view('manage.departments');  })->name('departments');
+        Route::get('/manage-courses', function () {  return view('manage.courses');  })->name('courses');
+        Route::get('/manage-staffs', function () {  return view('manage.staffs');  })->name('staffs');
+        Route::get('/manage-accounts', function () {  return view('manage.accounts');  })->name('accounts');
+    });
+
 });

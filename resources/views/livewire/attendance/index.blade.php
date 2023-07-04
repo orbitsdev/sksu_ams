@@ -1,4 +1,8 @@
 <div class=" h-screen">
+    <x-dialog />
+
+
+
     <div class="max-w-[1200px]   mx-auto h-screen">
         <div class=" h-full flex justify-center items-center ">
 

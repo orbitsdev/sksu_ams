@@ -1,0 +1,73 @@
+
+.sksu-primary{
+    background: #1c753a;
+}
+.sksu-font{
+    color: #1c753a;
+}
+
+.sksu-bg{
+    background: #036624;
+}
+.green1{
+    background: #045820;
+}
+
+.nav-bg{
+    background-image: linear-gradient( rgba(3, 106, 38, 0.60), rgba(4, 151, 54, 0.50)), url('../../public/images/line.png') ;
+}
+
+
+.department {
+    position: relative;
+    text-align: center;
+  }
+  
+  .department::before,
+  .department::after {
+    content: "";
+    display: block;
+    height: 2px;
+    position: absolute;
+    top: 68%;
+    background: white;
+    transform: translateY(-50%);
+  }
+  
+  .department::before {
+    width: 27%;
+    left: 0;
+    transform-origin: left;
+  }
+  
+  .department::after {
+    width: 27%;
+    right: 0;
+    transform-origin: right;
+  }
+
+
+  
+/* .department::before{
+    content:" ";
+    display: block;
+    height: 2px;
+    width: 20%;
+    position: absolute;
+    top: 65%;
+    left: 7%;
+    
+    background: white;
+  }
+
+.department::after{
+    content:" ";
+    display: block;
+    height: 2px;
+    width: 20%;
+
+    position: absolute;
+    top: 65%;
+    right: 7%;    
+    background: white;
+  } */
