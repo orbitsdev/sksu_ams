@@ -1,0 +1,1 @@
+<main class="w-full bg-blue-200">{{$slot}}</main>
