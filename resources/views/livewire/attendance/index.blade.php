@@ -53,16 +53,19 @@
 
             <img src="{{asset('images/sksulogo.png')}}" alt="sksu-logo.png" class="w-32 h-32 mx-auto absolute top-[-60px] left-0 right-0">
 
-            <div class="grid grid-cols-2 mt-14">
+            <div class="grid grid-cols-2 ">
 
-                <div class=" flex-2  flex items-center justify-center h-[300px] w-full ">
+                <div class="mt-14 flex-2  flex items-center justify-center h-[300px] w-full ">
                     <div class="w-[400px] h-[300px]">
                         <img src="{{ asset('images/profile2.jpg') }}" alt="profile.jpg" class="h-full w-full object-cover">
                     </div>
                   </div>
-                  
                 
-                <div class=" ">
+
+                
+                <div class="mt-2 ">
+                    <div class="mm  relative text-center text-white text-xl font-bold uppercase pt-4"> <div class="bg-white  rounded-full w-20 h-20 text-green-700  text-4xl p-1 inline-flex items-center justify-center uppercase"> In</div> </div>
+
                     <P class="text-4xl font-bold uppercase  ">
                         {{now()->timezone('Asia/Manila')->format('F d, Y')}}
             
@@ -72,7 +75,6 @@
                         {{now()->timezone('Asia/Manila')->format('h:i A')}}
             
                     </P>
-
                     <div class="  mt-8">
                         <P class="text-2xl p-0 font-semibold">
                            Maria Clara Angeles Trersiake Kate
