@@ -1,10 +1,6 @@
 <div>
 
-
     @section('title')
-        Department
+    Reports
     @endsection
-    {{ $this->table }}
-
-
 </div>

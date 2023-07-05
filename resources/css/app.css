@@ -9,3 +9,16 @@
     display: none !important;
   }
   
+.filament-tables-header-cell button {
+  @apply !text-white;
+  @apply !border-gray-100;
+}
+
+.filament-tables-table > thead tr {
+  background:  #049736 !important;
+ 
+}
+
+.filament-tables-text-column{
+  color: #575555 !important;
+}

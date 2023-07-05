@@ -18,7 +18,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::prefix('attendance')->name('attedance.')->group(function(){
+Route::prefix('attendance')->name('attendance.')->group(function(){
     Route::get('/', [AttendanceController::class, 'index'])->name('index');
 });
 
@@ -35,6 +35,7 @@ Route::middleware([ 'auth:sanctum',  config('jetstream.auth_session'), 'verified
         Route::get('/manage-courses', function () {  return view('manage.courses');  })->name('courses');
         Route::get('/manage-staffs', function () {  return view('manage.staffs');  })->name('staffs');
         Route::get('/manage-accounts', function () {  return view('manage.accounts');  })->name('accounts');
+        Route::get('/manage-users', function () {  return view('manage.users');  })->name('users');
     });
 
 });

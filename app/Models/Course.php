@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Account;
 use App\Models\Department;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
@@ -21,6 +22,11 @@ class Course extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    public function accounts()
+    {
+        return $this->hasMany(Account::class);
     }
 
       

@@ -10,10 +10,9 @@ class Index extends Component
 
     use Actions;
 
+    public $id_number;
+    public $password;
     public function mount(){
-
-
-
     }
 
 

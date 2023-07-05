@@ -1,10 +1,6 @@
 <div>
-
-
     @section('title')
-        Department
-    @endsection
+    User Accounts
+@endsection
     {{ $this->table }}
-
-
 </div>

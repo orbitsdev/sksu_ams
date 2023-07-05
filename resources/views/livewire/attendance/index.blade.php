@@ -14,19 +14,21 @@
                         <p class="uppercase text-3xl text-gray-500 text-center tracking-tight pb-10"> Attendance Monitoring System</p>
 
                         <div class="mt-7">
-                            <x-label  class="text-green-800" for="user_id" value="User ID" />
-                            <x-input class="block active:border-green-600 focus:border-green-600 outline-emerald-500 p-2 mt-1 w-full h-12" />
+                            <p for="name" class="block font-medium text-sm  text-gray-500" > ID Number </p>
+
+
+                            <x-input class="block border-gray-300 active:border-green-600 focus:border-green-600 outline-emerald-500 p-2 mt-1 w-full h-12" />
                         </div>
 
                         <div class="mt-5">
-                            <x-label  class="text-green-800" for="password" value="{{ __('Password') }}" />
-                            <x-input class="block active:border-green-600 focus:border-green-600 outline-emerald-500 p-2 mt-1 w-full h-12" />
+                            <p for="name" class="block font-medium text-sm  text-gray-500" > Password </p>
+                            <x-input class="block  border-gray-300 active:border-green-600 focus:border-green-600 outline-emerald-500 p-2 mt-1 w-full h-12" />
                         </div>
                         
 
                         <div class="mt-8 flex justify-end">
 
-                            <x-button class="bg-gray-200  hover:text-white  px-[34px] py-[12px]  w-full justify-center ">
+                            <x-button class="bg-gray-200  hover:text-white hover:bg-green-700  px-[34px] py-[12px]  w-full justify-center ">
                                 Log in
                             </x-button>
                         </div>
@@ -34,7 +36,7 @@
                     </form>
 
                     <div class="pt-16 flex  justify-end flex-col ">
-                        <a href="#" class="tex-sm text-slate-500 ">Admin?</a>
+                        <a href="{{route('dashboard')}}" class="tex-sm text-slate-500 hover:text-green-700 ">Admin?</a>
                         <p class="text-slate-500 text-sm "> Unauthorized personnel are not permitted access to this area</p>
                     </div>
                 </div>

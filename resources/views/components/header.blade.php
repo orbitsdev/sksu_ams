@@ -8,6 +8,7 @@
             <div class=""></div>
             <div class="">
             <ul class="flex items-center justify-between">
+                <a href="{{route('attendance.index')}}" class="inline-block hover:bg-[#045820] transition-all ease rounded-xs  px-4 py-4 text-sm"> Attendance </a>
                 <a href="" class="inline-block hover:bg-[#045820] transition-all ease rounded-xs  px-4 py-4 text-sm"> Home </a>
                 <a href="" class="inline-block hover:bg-[#045820] transition-all ease rounded-xs  px-4 py-4 text-sm"> Update Information</a>
                 <a href="" class="inline-block hover:bg-[#045820] transition-all ease rounded-xs  px-4 py-4 text-sm"> Help Desk</a>

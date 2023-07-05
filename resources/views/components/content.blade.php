@@ -1,6 +1,12 @@
-<main class="w-full mx-auto px-12 ">
-    <h1 class="text-3xl font-bold text-gray-800 mb-5 mt-5  @if(View::hasSection('title')) py-4 @endif">
+<main class="w-full mx-auto px-8  bg-[#E4E4E4] ">
+  
+    <div class="shadow rounded-lg mt-8 bg-white">
+  <h1 class="text-3xl font-semibold text-gray-700  mt-5 px-6 pb-0 @if(View::hasSection('title')) pt-4 @endif">
         @yield('title')
     </h1>
-    {{$slot}}
+    <div class="p-4">
+
+        {{$slot}}
+    </div>
+    </div>
 </main>

@@ -8,7 +8,7 @@
         <x-navigation></x-navigation>
        
         <x-content>
-            @livewire('manage.manage-account')`   
+            @livewire('manage.manage-account')   
         </x-content>
 
     </section> 
