@@ -261,14 +261,7 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
                 ])
                 ->button()
                 ->modalHeading('Create new account'),
-            // Action::make('Create New ')->button()->action(function(array $data) : void {
-
-            // })->form([
-            //     TextInput::make('name')->label('Name')->required(),
-            //     Forms\Components\Select::make('roles.name')
-            //     ->label('Select Role')
-            //     ->options(Role::query()->where('name', '!=', 'admin')->pluck('name', 'id')),
-            // ])->icon('plus'),
+        
 
 
         ];
