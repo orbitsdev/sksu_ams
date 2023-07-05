@@ -59,12 +59,13 @@
                     <div class="w-[400px] h-[300px]">
                         <img src="{{ asset('images/profile2.jpg') }}" alt="profile.jpg" class="h-full w-full object-cover">
                     </div>
+                    {{-- <div  class=" bg-white absolute w-[400px] h-[300px] z-[-1px]"> </div> --}}
                   </div>
                 
 
                 
                 <div class="mt-2 ">
-                    <div class="mm  relative text-center text-white text-xl font-bold uppercase pt-4"> <div class="bg-white  rounded-full w-20 h-20 text-green-700  text-4xl p-1 inline-flex items-center justify-center uppercase"> In</div> </div>
+                    <div class="mm  relative text-center text-white text-xl font-bold uppercase pt-4"> <div class="bg-white  rounded-full w-[70px] h-[70px] text-green-700  text-4xl p-0.5 inline-flex items-center justify-center uppercase"> In</div> </div>
 
                     <P class="text-4xl font-bold uppercase  ">
                         {{now()->timezone('Asia/Manila')->format('F d, Y')}}
@@ -75,13 +76,13 @@
                         {{now()->timezone('Asia/Manila')->format('h:i A')}}
             
                     </P>
-                    <div class="  mt-8">
+                    <div class="  mt-6">
                         <P class="text-2xl p-0 font-semibold">
                            Maria Clara Angeles Trersiake Kate
                         </P>
 
                     </div>
-                    <P class="mt-4 text-lg ">
+                    <P class="mt-5 text-lg ">
                         Department Of Science and Health
                     </P>
                     <P class=" text-lg ">
@@ -117,7 +118,7 @@
             
                 <div class="flex">
                     {{-- <x-button flat label="Cancel" x-on:click="close" /> --}}
-                    <x-button class="bg-green-700 ok transition-all" primary label="Save" x-on:click="close" />
+                    <x-button class="bg-green-700 ok transition-all" primary label="DONE" icon="check" x-on:click="close" />
                 </div>
             </div>
         </x-slot>
