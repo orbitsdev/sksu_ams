@@ -46,6 +46,34 @@
     transform-origin: right;
   }
 
+  .sk-button{
+    background: #e5e7eb !important;
+    color: #6b7280 !important;
+    
+  }
+  
+  .sk-button:hover{
+    background: #166534 !important;
+    color: white !important;
+  }
+  
+  .ok{
+    color: white !important;
+    background: #166534 !important;
+    
+  }
+  .ok:hover{
+    background: #15803d !important;
+    color: white !important;
+    
+  }
+  
+  .modal-c{
+    background: #166534 !important;
+    color: white !important;
+
+  }
+
 
 /* .department::before{
     content:" ";
