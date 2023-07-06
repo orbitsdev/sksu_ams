@@ -79,6 +79,7 @@ class ManageCourse extends Component implements HasTable , HasForms
                 ->options(Department::query()->pluck('name', 'id'))->required()->searchable(),  
                 Forms\Components\TextInput::make('name')
                     ->label('Name')
+                    ->unique()
                     ->required(),
                   
             ])->modalHeading('Create Course'),

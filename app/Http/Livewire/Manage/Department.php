@@ -94,6 +94,7 @@ class Department extends Component implements Tables\Contracts\HasTable, Forms\C
             })->form([
                 Forms\Components\TextInput::make('name')
                     ->label('Name')
+                    ->unique()
                     ->required(),
             ])->modalHeading('Create Department'),
         ];
