@@ -11,10 +11,7 @@ class TotalInside extends Component
 
     public $totalInside;
 
-    public function mount(){
-
-        
-    }
+   
     public function render()
     {
         $latestRecord = DayRecord::latest()->first();
