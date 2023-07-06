@@ -1,4 +1,4 @@
-<div class="shadow rounded-md bg-white px-4 py-4 border  " wire.poll.2s.visible>
+<div class="shadow rounded-md bg-white px-4 py-4 border  " wire:poll.1s.visible>
     <div class="flex justify-between px-2">
     
         <div>
