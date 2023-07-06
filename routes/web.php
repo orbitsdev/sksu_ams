@@ -26,6 +26,10 @@ Route::prefix('attendance')->name('attendance.')->group(function(){
 
 
 
+
+
+
+
 Route::middleware([ 'auth:sanctum',  config('jetstream.auth_session'), 'verified'])->group(function () {
     
     Route::get('/dashboard', function () {  return view('dashboard');  })->name('dashboard');
@@ -37,5 +41,6 @@ Route::middleware([ 'auth:sanctum',  config('jetstream.auth_session'), 'verified
         Route::get('/manage-accounts', function () {  return view('manage.accounts');  })->name('accounts');
         Route::get('/manage-users', function () {  return view('manage.users');  })->name('users');
     });
+    Route::get('/account/details', function(){return view('account-details');})->name('account.details');
 
 });
