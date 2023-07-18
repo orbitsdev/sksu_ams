@@ -1,6 +1,9 @@
 <div>
+
     @section('title')
-    System Accounts
-@endsection
+    Campuses    
+    @endsection
     {{ $this->table }}
+
+
 </div>

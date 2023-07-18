@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Account;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AttendanceController;
 
@@ -34,13 +35,26 @@ Route::middleware([ 'auth:sanctum',  config('jetstream.auth_session'), 'verified
     
     Route::get('/dashboard', function () {  return view('dashboard');  })->name('dashboard');
     Route::get('/reports', function () {  return view('reports');  })->name('reports');
+    
     Route::name('manage.')->group(function(){
+        Route::get('/manage-campuses', function () {  return view('manage.campuses');  })->name('campuses');
         Route::get('/manage-department', function () {  return view('manage.departments');  })->name('departments');
         Route::get('/manage-courses', function () {  return view('manage.courses');  })->name('courses');
         Route::get('/manage-staffs', function () {  return view('manage.staffs');  })->name('staffs');
         Route::get('/manage-accounts', function () {  return view('manage.accounts');  })->name('accounts');
         Route::get('/manage-users', function () {  return view('manage.users');  })->name('users');
     });
-    Route::get('/account/details', function(){return view('account-details');})->name('account.details');
+
+
+    Route::get('/account/details/{account:slug}', function ($slug) {
+        // $account = Account::where('slug', $slug)->first();
+    
+        // if (!$account) {
+        //     abort(404);
+        // }
+        $account = Account::where('slug', $slug)->firstOrFail();
+        return view('account-details', compact('account'));
+    })->name('account.details');
+    
 
 });

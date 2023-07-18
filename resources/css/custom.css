@@ -1,4 +1,10 @@
 
+
+
+
+
+
+
 .sksu-primary{
     background: #1c753a;
 }
@@ -14,7 +20,8 @@
 }
 
 .nav-bg{
-    background-image: linear-gradient( rgba(3, 106, 38, 0.60), rgba(4, 151, 54, 0.50)), url('../../public/images/line.png') ;
+  background-image: linear-gradient( rgba(4, 150, 54, 0.80), rgba(9, 160, 59, 0.80)), url('../../public/images/line.png') ;
+  /* background-image: linear-gradient( rgba(4, 151, 54, 0.85), rgba(9, 151, 54, 0.50)), url('../../public/images/line.png') ; */
 }
 
 

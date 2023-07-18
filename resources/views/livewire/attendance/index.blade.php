@@ -76,7 +76,7 @@
                     <div class="mt-8 flex justify-end">
                         <x-button wire:click="login" spinner="login"
                             class="sk-button px-[34px] py-[12px]  w-full justify-center ">
-                            Log in
+                           Submit
                         </x-button>
                     </div>
 

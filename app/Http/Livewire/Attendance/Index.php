@@ -29,21 +29,9 @@ class Index extends Component
     public function mount(){
     }
 
-    // public function showSuccess($header ='Data saved', $content="Your data was successfully save"){
-       
-    //     $this->dialog()->success(
-
-    //         $title = $header,
-    //         $description = $content
-
-    //     );
-       
-    // }
-
 
     public function render()
     {
-        
         return view('livewire.attendance.index');
     }
 

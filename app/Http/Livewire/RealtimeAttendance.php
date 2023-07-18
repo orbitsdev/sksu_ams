@@ -22,7 +22,9 @@ class RealtimeAttendance extends Component implements Tables\Contracts\HasTable
     public $todayRecord;
 
     public function mount(){
-           $this->todayRecord = DayRecord::latest()->first();
+           
+        $this->todayRecord = DayRecord::latest()->first();
+
     }
     protected function getTablePollingInterval(): ?string
 {
@@ -39,7 +41,11 @@ class RealtimeAttendance extends Component implements Tables\Contracts\HasTable
             return Login::query()->where('day_record_id', $latestDay->id)->whereHas('logout', function($query){
                 $query->where('status','!=', 'Did Not Logout');
             })->latest();
+        }else{
+            return Login::query()->latest();
         }
+
+
 
     } 
 

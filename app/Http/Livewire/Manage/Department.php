@@ -52,6 +52,7 @@ class Department extends Component implements Tables\Contracts\HasTable, Forms\C
                         
                     $record->name = $data['name'];
                     $record->save();
+                    $record->generateSlug();
 
                     $this->showSuccess('Department Updated', 'Department was successfully updated');
                 })
@@ -87,9 +88,10 @@ class Department extends Component implements Tables\Contracts\HasTable, Forms\C
         return [
             Action::make('create')->button()->icon('heroicon-s-plus')->label('Create New')->action(function($data){
                 // dd($data);
-
-                DepartmentModel::create(['name'=> $data['name']]);
+                $department = DepartmentModel::create(['name' => $data['name']]);
+                $department->generateSlug();
                 $this->showSuccess('Department Created', 'Department was successfully created');
+                
 
             })->form([
                 Forms\Components\TextInput::make('name')

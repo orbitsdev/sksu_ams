@@ -92,7 +92,13 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
     {
         return [
 
+
+
             Tables\Actions\ActionGroup::make([
+
+                        
+        Action::make('View')->icon('heroicon-s-eye')->label('View Profile')
+        ->url(fn (Account $record): string => route('account.details', $record)),
 
                 EditAction::make('edit')->action(function(Account $record, array $data){
                   
@@ -124,6 +130,9 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
                         'password' => $data['password'],
                     ]);
 
+                    $record->generateSlug();
+                    $record->save();
+                    $this->showSuccess('Account Updated', 'Account was successfully updated');
 
                 })
                 ->label('Update')
@@ -216,8 +225,10 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
                     ];
 
                   $new_account =   Account::create($accountdata);
+                  $new_account->generateSlug();
+                  $new_account->save();
                 
-                    $this->showSuccess('Account Saved', 'Account was successfully created');
+                 $this->showSuccess('Account Saved', 'Account was successfully created');
 
                 })
                 ->form([

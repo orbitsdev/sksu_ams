@@ -2,7 +2,7 @@
 
 
 
-    <x-header></x-header>
+ 
 
 
     <section class="flex h-full min-h-[100vh] ">

@@ -23,18 +23,32 @@ class Department extends Model
         return 'slug';
     }
 
+    protected static function boot()
+{
+    parent::boot();
+
+    static::creating(function ($department) {
+        $department->generateSlug();
+    });
+
+    static::updating(function ($department) {
+        $department->generateSlug();
+    });
+}
+
     
  public function generateSlug()
  {
-     $baseSlug = Str::slug($this->title);
-     $slug = $baseSlug;
-     $counter = 1;
+    $baseSlug = Str::slug($this->name);
+    $slug = $baseSlug;
+    $counter = 1;
 
-     while (self::where('slug', $slug)->exists()) {
-         $slug = $baseSlug . '-' . $counter;
-         $counter++;
-     }
+    while (self::where('slug', $slug)->exists()) {
+        $slug = $baseSlug . '-' . $counter;
+        $counter++;
+    }
 
-     $this->slug = $slug;
+    $this->slug = $slug;
  }
+
 }

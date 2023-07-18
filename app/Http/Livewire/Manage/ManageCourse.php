@@ -75,8 +75,15 @@ class ManageCourse extends Component implements HasTable , HasForms
 
             })->form([
                 Forms\Components\Select::make('department')
-                ->label('Choose Department')
-                ->options(Department::query()->pluck('name', 'id'))->required()->searchable(),  
+                ->label('Choose role')
+                ->options(
+                    Department::query()->pluck('name', 'id')->map(function ($name) {
+                        return ucwords($name);
+                    })
+                )->required()->searchable(),
+                // Forms\Components\Select::make('department')
+                // ->label('Choose Department')
+                // ->options(Department::query()->pluck('name', 'id'))->required()->searchable(),  
                 Forms\Components\TextInput::make('name')
                     ->label('Name')
                     ->unique()
