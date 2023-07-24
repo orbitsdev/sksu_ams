@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Account;
+use App\Models\Section;
 use App\Models\Department;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
@@ -18,6 +19,12 @@ class Course extends Model
     {
         return $this->belongsTo(Department::class);
     }
+
+    public function sections(){
+        return $this->hasMany(Section::class);
+    }
+
+   
 
     public function getRouteKeyName(): string
     {

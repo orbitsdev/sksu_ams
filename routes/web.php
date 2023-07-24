@@ -37,9 +37,11 @@ Route::middleware([ 'auth:sanctum',  config('jetstream.auth_session'), 'verified
     Route::get('/reports', function () {  return view('reports');  })->name('reports');
     
     Route::name('manage.')->group(function(){
+        Route::get('/manage-school-year', function () {  return view('manage.school-year');  })->name('school-year');
         Route::get('/manage-campuses', function () {  return view('manage.campuses');  })->name('campuses');
         Route::get('/manage-department', function () {  return view('manage.departments');  })->name('departments');
         Route::get('/manage-courses', function () {  return view('manage.courses');  })->name('courses');
+        Route::get('/manage-sections', function () {  return view('manage.sections');  })->name('sections');
         Route::get('/manage-staffs', function () {  return view('manage.staffs');  })->name('staffs');
         Route::get('/manage-accounts', function () {  return view('manage.accounts');  })->name('accounts');
         Route::get('/manage-users', function () {  return view('manage.users');  })->name('users');

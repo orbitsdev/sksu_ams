@@ -5,30 +5,28 @@ namespace App\Http\Livewire\Manage;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Course;
+use App\Models\Section;
+
 use Livewire\Component;
 use App\Models\Department;
 use WireUi\Traits\Actions;
 use Filament\Tables\Actions\Action;
-use Illuminate\Contracts\View\View;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Contracts\HasTable;
 use Filament\Notifications\Notification; 
-
 use Filament\Tables\Actions\DeleteAction;
 use Illuminate\Contracts\Database\Query\Builder;
 
-class ManageCourse extends Component implements HasTable , HasForms 
+class ManageSection extends Component implements Tables\Contracts\HasTable, Forms\Contracts\HasForms
 {
 
     use Tables\Concerns\InteractsWithTable; 
     
     use Forms\Concerns\InteractsWithForms; 
-
     use Actions;
 
-    
+
+  
     public function showSuccess($header ='Data saved', $content="Your data was successfully save"){
        
         $this->dialog()->success(
@@ -44,7 +42,7 @@ class ManageCourse extends Component implements HasTable , HasForms
 
     protected function getTableQuery(): Builder 
     {
-        return Course::query()->latest();
+        return Section::query()->latest();
     } 
 
     protected function getTableColumns(): array
@@ -52,7 +50,7 @@ class ManageCourse extends Component implements HasTable , HasForms
         return [
             // Tables\Columns\TextColumn::make('slug'),
             Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
-            Tables\Columns\TextColumn::make('department.name')->sortable()->searchable(),
+            Tables\Columns\TextColumn::make('course.name')->sortable()->searchable(),
         ];
     }
 
@@ -65,12 +63,12 @@ class ManageCourse extends Component implements HasTable , HasForms
     protected function getTableHeaderActions(): array
     {
         return [
-            Action::make('create')->button()->icon('heroicon-s-plus')->label('Create New Course')->action(function($data){
+            Action::make('create')->button()->icon('heroicon-s-plus')->label('Create New Section')->action(function($data){
                 // dd($data);
 
-                Course::create([
+                Section::create([
                     'name'=> $data['name'],
-                    'department_id'=> $data['department_id'],
+                    'course_id'=> $data['course_id'],
                 ]);
 
                 // $this->showSuccess('Course Saved', 'Course was successfully created');
@@ -81,14 +79,12 @@ class ManageCourse extends Component implements HasTable , HasForms
 
 
             })->form([
-                Forms\Components\Select::make('department_id')
-                ->label('Choose department')
+                Forms\Components\Select::make('course_id')
+                ->label('Choose Course')
                 ->options(
-
                     Department::query()->pluck('name', 'id')->map(function ($name) {
                         return ucwords($name);
                     })
-                    
                 )->required()->searchable(),
                 // Forms\Components\Select::make('department')
                 // ->label('Choose Department')
@@ -108,10 +104,10 @@ class ManageCourse extends Component implements HasTable , HasForms
             Tables\Actions\ActionGroup::make([
 
                 EditAction::make('update')->label('Update')
-                ->action(function (Course $record, array $data): void {
+                ->action(function (Section $record, array $data): void {
                         
                     $record->name = $data['name'];
-                    $record->department_id = $data['department_id'];
+                    $record->course_id = $data['course_id'];
                     $record->save();   
                     // $this->showSuccess('Course Saved', 'Course was successfully updated');
                     Notification::make() 
@@ -121,14 +117,14 @@ class ManageCourse extends Component implements HasTable , HasForms
     
                  
                 })
-                ->mountUsing(fn (Forms\ComponentContainer $form, Course $record) => $form->fill([
+                ->mountUsing(fn (Forms\ComponentContainer $form, Section $record) => $form->fill([
                     'name' => $record->name,
-                    'department_id' => $record->department->id,
+                    'course_id' => $record->course->id,
                 ]))
                 ->form([
-                    Select::make('department_id')
-                    ->label('')
-                    ->options(Department::all()->pluck('name','id'))->searchable(),
+                    Select::make('course_id')
+                    ->label('Choose Course')
+                    ->options(Course::all()->pluck('name','id'))->searchable(),
                     Forms\Components\TextInput::make('name')->label('name')->required(),
                     // Forms\Components\TextInput::make('department')->label('Current Department')->disabled(),
                    
@@ -152,6 +148,8 @@ class ManageCourse extends Component implements HasTable , HasForms
     }
     public function render()
     {
-        return view('livewire.manage.manage-course');
+        return view('livewire.manage.manage-section');
     }
+
+
 }

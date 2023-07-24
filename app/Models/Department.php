@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Campus;
 use App\Models\Course;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
@@ -16,6 +17,10 @@ class Department extends Model
     public function courses()
     {
         return $this->hasMany(Course::class);
+    }
+
+    public function campus(){
+        return $this->belongsTo(Campus::class);
     }
 
     public function getRouteKeyName(): string
