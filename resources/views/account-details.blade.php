@@ -117,7 +117,8 @@
           </div>
           <div class="mt-6 sm:col-span-7 sm:mt-0 md:row-end-1">
             <h3 class="text-lg font-medium text-gray-900 capitalize" >
-                    {{$account->department->name ?? ''}}
+                    {{$account->department->name ?? ''}} |
+                    <span class="text-gray-600 inline-block">{{$account->schoolYear->from }} - {{$account->schoolYear->to }} </span>
             </h3>
             {{-- <p class="mt-1 font-medium text-gray-900 capitalize">            {{$account->role->name ?? ''}}
             </p> --}}

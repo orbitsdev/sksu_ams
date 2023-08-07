@@ -106,22 +106,35 @@
         $logoutrecord = $accountLoginRecord->logout;
         @endphp
             <div class="modal-c rounded-md p-6 relative">
+                <div class="relative">
 
-                <img src="{{ asset('images/sksulogo.png') }}" alt="sksu-logo.png"
+                    <img src="{{ asset('images/sksulogo.png') }}" alt="sksu-logo.png"
                     class="w-32 h-32 mx-auto absolute top-[-60px] left-0 right-0">
+                   
+                </div>
 
                 <div class="grid grid-cols-2 ">
 
-                    <div class="mt-6 flex-2  flex items-center justify-center h-[300px] w-full  pr-16 ">
-                        <div class="w-[400px] h-[300px] rounded">
-                            <a href="{{ Storage::url($account->profile_path) }}" target=_blank>
+                  <div class="mt-6 flex-2  flex items-center justify-center h-[300px] w-full  pr-16 ">
+    <div class="w-[400px] h-[300px] rounded relative">
+        @if(!empty($account->profile_path))
+        <a href="{{ Storage::url($account->profile_path) }}" target="_blank">
+            <img src="{{ Storage::url($account->profile_path) }}" alt="profile.jpg" class="h-full w-full object-cover rounded">
+        </a>
+        @else
+        <div  class="h-full w-full  rounded border-4 border-white flex items-center justify-center text-3xl font-semibold"> No Profile </div>
 
-                                <img src="{{ Storage::url($account->profile_path) }}" alt="profile.jpg"
-                                class="h-full w-full object-cover rounded">
-                            </a>
-                        </div>
-                        {{-- <div  class=" bg-white absolute w-[400px] h-[300px] z-[-1px]"> </div> --}}
-                    </div>
+        @endif
+        {{-- Add the role name as text with a gradient background --}}
+        {{-- <div class="absolute top-3 left-3">
+            <div class="bg-gradient-to-r from-transparent via-transparent to-black text-transparent inline-block px-4 py-2 rounded">
+                {{$account->role->name}}
+            </div>
+        </div> --}}
+    </div>
+    {{-- <div  class=" bg-white absolute w-[400px] h-[300px] z-[-1px]"> </div> --}}
+</div>
+
 
 
 
@@ -164,6 +177,8 @@
                                 </P>
                             @endif
                         @endif
+
+                        
                         <div class="  mt-6">
                             <P class="text-2xl p-0 font-semibold capitalize">
                                 {{ $account->first_name }} {{ $account->last_name }}
@@ -171,11 +186,13 @@
 
                         </div>
                         <P class="mt-5 text-lg capitalize ">
-                            {{ $account->course->department->name }}
+                           {{$account->department->name ?? ''}}
                         </P>
+                        @if($account->role->name == 'student')
                         <P class=" text-lg capitalize ">
-                            {{ $account->course->name }}
+                            {{$account->course->name ?? '' }}
                         </P>
+                        @endif
                         <P class=" text-lg capitalize ">
                             {{ $account->role->name }}
                         </P>

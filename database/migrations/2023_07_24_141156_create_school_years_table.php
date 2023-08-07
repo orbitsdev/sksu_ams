@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('from');
             $table->bigInteger('to');
+            $table->boolean('status')->default(false);
             $table->timestamps();
         });
     }

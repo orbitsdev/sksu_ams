@@ -2,27 +2,34 @@
 
 namespace App\Http\Livewire\Manage;
 
+use Closure;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Campus;
 use Livewire\Component;
+
+
 use App\Models\SchoolYear;
-
-
 use WireUi\Traits\Actions;
+use Illuminate\Support\Facades\DB;
 use Filament\Forms\Components\Grid;
 use Filament\Tables\Actions\Action;
+
 use Maatwebsite\Excel\Facades\Excel;
 use Filament\Forms\Components\Select;
-
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Storage;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Tables\Columns\BadgeColumn;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Notifications\Notification;
 use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Columns\ToggleColumn;
 use Illuminate\Contracts\Database\Query\Builder;
+
 
 
 class ManageSchoolYear extends Component  implements Tables\Contracts\HasTable
@@ -43,13 +50,17 @@ class ManageSchoolYear extends Component  implements Tables\Contracts\HasTable
     {
         return [
             // Tables\Columns\TextColumn::make('slug'),
-            Tables\Columns\TextColumn::make('from')->label('School Year')->formatStateUsing(function ($record) {
+            TextColumn::make('from')->label('School Year')->formatStateUsing(function ($record) {
                 return  $record->from . ' - ' . $record->to;
             })->searchable(query: function (Builder $query, string $search): Builder {
                 return $query
-                    ->orWhere('from', 'like', "%{$search}%")
-                    ->orWhere('to', 'like', "%{$search}%");
+                    ->where('from', 'like', "%{$search}%")->orWhere('to', 'like', "%{$search}%");
             }),
+          
+            TextColumn::make('status')->color('danger')
+            ->formatStateUsing(fn (string $state): string => $state ? 'Currently Recording' : ' ' )
+         
+
         ];
     }
 
@@ -93,13 +104,23 @@ class ManageSchoolYear extends Component  implements Tables\Contracts\HasTable
 
 
             Action::make('create')->button()->icon('heroicon-s-plus')->label('Set School Year ')->action(function ($data) {
+                try {
+                    DB::beginTransaction();
 
-                SchoolYear::create($data);
-                // $department = Campus::create(['name' => $data['name']]);
-                Notification::make()
-                    ->title('Saved successfully')
-                    ->success()
-                    ->send();
+                    SchoolYear::create($data);
+                    // $department = Campus::create(['name' => $data['name']]);
+                    DB::commit();
+                    Notification::make()
+                        ->title('Saved successfully')
+                        ->success()
+                        ->send();
+                } catch (QueryException $e) {
+                    DB::rollBack();
+                    Notification::make()
+                        ->title('Operation faild')
+                        ->danger()
+                        ->send();
+                }
             })->form([
 
 
@@ -110,10 +131,9 @@ class ManageSchoolYear extends Component  implements Tables\Contracts\HasTable
                                 return now()->year;
                             })->required()
                             ->columnSpan(1)
-                            ->default(function(){
-                                 return (int)now()->format('Y');
-                            })
-                            ,
+                            ->default(function () {
+                                return (int)now()->format('Y');
+                            }),
 
                         TextInput::make('to')
                             ->type('number')->label('To')->placeholder(function () {
@@ -121,10 +141,15 @@ class ManageSchoolYear extends Component  implements Tables\Contracts\HasTable
                             })
                             ->required()
                             ->columnSpan(1)
-                            ->default(function(){
+                            ->default(function () {
                                 return (int)now()->addYear()->format('Y');
-                           })
-                            ,
+                            }),
+
+                            Select::make('status')
+                            ->options([
+                                true => 'Set for Recording',
+                                false => 'Remove for Recording',
+                            ])->columnSpan(2)->default(false)->hidden(),
                         // ...
                     ]),
 
@@ -178,9 +203,73 @@ class ManageSchoolYear extends Component  implements Tables\Contracts\HasTable
                 EditAction::make('update')->label('Update')
                     ->action(function (SchoolYear $record, array $data): void {
 
-                         $record->from = $data['from'];
-                         $record->to = $data['to'];
-                         $record->save();
+                        try {
+                        //     DB::beginTransaction();
+                        //     $record->from = $data['from'];
+                        //     $record->to = $data['to'];
+                        //     $record->status = $data['status'];
+                        //     $record->save();
+                        //      Notification::make() 
+                        // ->title('Update successfully')
+                        // ->success()
+                        // ->send();
+                        //     DB::commit();
+
+                        DB::beginTransaction();
+
+                        // Check if there's already a record with status = true
+                        $existingTrueRecord = SchoolYear::where('status', true)->first();
+                    
+                        if ($data['status'] && $existingTrueRecord) {
+                            // There's already a record with status = true, show an error message
+
+                            $this->dialog()->error(
+
+                                $title = 'Operation Failed',
+                    
+                                $description = 'Operation failed: Another SchoolYear record already has status true.'
+                    
+                            );
+
+                            // Notification::make()
+                            // ->title('Operation failed: Another SchoolYear record already has status true.')
+                            // ->danger()
+                            // ->send();
+                             return;
+                             
+                        }
+                    
+                        $record->from = $data['from'];
+                        $record->to = $data['to'];
+
+
+                        if(!empty($data['status'])){
+                         
+
+                            $record->status = (int)$data['status'];
+                        }else{
+                            
+                            $record->status = (int)$data['status'];
+                        }
+
+
+                        $record->save();
+                    
+                        Notification::make() 
+                            ->title('Update successfully')
+                            ->success()
+                            ->send();
+                    
+                        DB::commit();
+                        }catch(QueryException $e){
+                            DB::rollBack();
+                            Notification::make()
+        ->title('Operation failed: ' . $e->getMessage())
+        ->danger()
+        ->send();
+                        }
+
+                      
 
 
                         // Notification::make() 
@@ -191,22 +280,31 @@ class ManageSchoolYear extends Component  implements Tables\Contracts\HasTable
                     ->mountUsing(fn (Forms\ComponentContainer $form, SchoolYear $record) => $form->fill([
                         'from' => $record->from,
                         'to' => $record->to,
+                        'status' => $record->status,
                     ]))
                     ->form([
-                        
-                Grid::make(2)
-                ->schema([
-                    TextInput::make('from')
-                        ->type('number')->label('From')->placeholder(function () {
-                            return now()->year;
-                        })->required()->columnSpan(1),
 
-                    TextInput::make('to')
-                        ->type('number')->label('To')->placeholder(function () {
-                            return now()->addYear()->format('Y');
-                        })->required()->columnSpan(1),
-                    // ...
-                ]),
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('from')
+                                    ->type('number')->label('From')->placeholder(function () {
+                                        return now()->year;
+                                    })->required()->columnSpan(1),
+
+                                TextInput::make('to')
+                                    ->type('number')->label('To')->placeholder(function () {
+                                        return now()->addYear()->format('Y');
+                                    })->required()->columnSpan(1),
+
+                               
+                                  
+                                    
+                            Select::make('status')
+                            ->options([
+                                true => 'Set for recording',
+                                false => 'Remove for Recording',
+                            ])->columnSpan(2)
+                            ]),
                     ])->button()->modalHeading('Update Campus'),
 
                 DeleteAction::make('Delete')->button()->label('Delete'),

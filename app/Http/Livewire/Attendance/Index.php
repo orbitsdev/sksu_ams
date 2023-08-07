@@ -2,9 +2,11 @@
 
 namespace App\Http\Livewire\Attendance;
 
+use App\Models\Log;
 use App\Models\Account;
 use Livewire\Component;
 use App\Models\DayRecord;
+use App\Models\SchoolYear;
 use WireUi\Traits\Actions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
@@ -24,6 +26,7 @@ class Index extends Component
     public $errorMessage='';
     public $errorHeader='';
     public $recordDay;
+    public $activeYear;
     public $account;
 
     public function mount(){
@@ -93,12 +96,14 @@ class Index extends Component
                     }
 
                 }else{
-                    $this->recordDay = DayRecord::create();
+                   $this->createDayRecord();
                     $this->createDayLoginRecordWithLogout();
                }
                 
             }else{
-                $this->recordDay = DayRecord::create();
+               
+               $this->createDayRecord();
+            
                 $this->createDayLoginRecordWithLogout();
            }
         
@@ -117,12 +122,47 @@ class Index extends Component
         
 
 
+    public function createDayRecord(){
+            $this->activeYear = SchoolYear::where('status', true)->first();
+         
+           if(!empty($this->activeYear)){
+          
+            $this->recordDay = DayRecord::create([
+                'school_year_id' => $this->activeYear->id,
+            ]);
+        }else{
+                
+
+            $this->showError(
+                'No School Year Set for Recording',
+                'The school year for recording has not been configured by the admin yet. Please set a valid school year to proceed.',
+                'exception'
+            );
+            
+           
+            
+
+              
+           }
+
+           
+    }
 
     public function createDayLoginRecordWithLogout(){
         $newLoginRecord = $this->recordDay->logins()->create(['account_id' => $this->account->id,]);
         $newLogoutRecord = $newLoginRecord->logout()->create(['status'=> 'Not Logout']);
-        $this->account = Account::where('id_number', $this->idnumber)->first();
-        $this->isSuccess = true;
+         $this->account = Account::where('id_number', $this->idnumber)->first();
+
+    $newLog = Log::create([
+        'login_id' => $newLoginRecord->id,
+        'role_name' => $this->account->role->name,
+        'school_year' => $this->recordDay->schoolYear,
+        'account' => $this->account,
+        'guardian' => $this->account->guardian,
+    ]);
+
+    $this->isSuccess = true;
+        
     }
 
     
