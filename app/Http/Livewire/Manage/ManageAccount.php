@@ -10,6 +10,7 @@ use App\Models\User;
 use Filament\Tables;
 use App\Models\Course;
 use App\Models\Account;
+use App\Models\Section;
 use Livewire\Component;
 use App\Models\Department;
 use App\Models\SchoolYear;
@@ -148,14 +149,27 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
                             'department_id' => (int)$data['department'],
                             'school_year_id' => (int)$data['school_year_id'],
                             'course_id' => (int)$data['course'],
+                            'section_id' => (int)$data['section'],
                             'profile_path' => $data['profile_path'],
                         ];
 
-                        $record->guardian()->update([
-                            'first_name' => $data['guardian_first_name'],
-                            'last_name' => $data['guardian_last_name'],
-                            'phone_number' => $data['guardian_phone_number'],
-                        ]);
+
+                        if($record->guardian){
+                          
+                            $record->guardian()->update([
+                                'first_name' => $data['guardian_first_name'],
+                                'last_name' => $data['guardian_last_name'],
+                                'phone_number' => $data['guardian_phone_number'],
+                            ]);
+                        }else{
+                         
+                            $record->guardian()->create([
+                                'first_name' => $data['guardian_first_name'],
+                                'last_name' => $data['guardian_last_name'],
+                                'phone_number' => $data['guardian_phone_number'],
+                            ]);
+                        }
+
 
                         // $course = Course::where('department_id', $data['department'])->first();
                         
@@ -183,7 +197,7 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
                         if($record->id_number != $data['id_number']){
                             $accountdata['id_number'] = $data['id_number'];
                             if(Account::where('id_number', $data['id_number'])->exists()){
-                                $this->showError('ID Number Exists', 'The ID Number you entered already exists');
+                                $this->showError('Operation Faild', 'The ID Number you entered already exists');
                                 return;
                             }
                         }
@@ -209,6 +223,7 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
                             $form->fill([
                                 'department' => $record->department_id ?? null,
                                 'course' => $record->course->id ?? null,
+                                'section' => $record->section->id ?? null,
                                 'school_year_id' => $record->schoolYear->id ?? null,
                                 'id_number' =>  $record->id_number,
                                 'first_name' => $record->first_name,
@@ -216,9 +231,9 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
                                 'middle_name' => $record->middle_name,
                                 'role' => $record->role_id,
                                 'profile_path' => $record->profile_path,
-                                'guardian_first_name' => $record->guardian->first_name,
-                                'guardian_last_name' => $record->guardian->last_name,
-                                'guardian_phone_number' => $record->guardian->phone_number,
+                                'guardian_first_name' => $record->guardian->first_name ?? null,
+                                'guardian_last_name' => $record->guardian->last_name ?? null,
+                                'guardian_phone_number' => $record->guardian->phone_number ?? null,
 
                             ]);
                             }else{  
@@ -240,6 +255,7 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
                         }
                     )
                     ->form([
+
                         FileUpload::make('profile_path')
                         ->image()
                         ->disk('public')
@@ -249,43 +265,46 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
     
                         Fieldset::make('Member Details')
                             ->schema([
-    
-                                TextInput::make('id_number')->label('ID Number')->required()->columnSpan(2),
-    
+                                Grid::make(4)
+                                ->schema([
+                                    TextInput::make('id_number')->label('ID Number')->required()->columnSpan(3),
+                                    Select::make('role')
+                                    ->label('Account Role')
+                                    ->options(Role::query()->where('name', '!=', 'admin')->pluck('name', 'id')->map(function($name){
+                                        return ucfirst($name);
+                                    }))
+                                    ->reactive()
+                                    ->required()
+                                    ->columnSpan(1)
+                                ]),
+                               
+                                
                                 Grid::make(3)
                                     ->schema([
                                         TextInput::make('first_name')->label('First Name')->required(),
                                         TextInput::make('middle_name')->label('Middle Initial')->required(),
                                         TextInput::make('last_name')->label('Last Name')->required(),
                                     ]),
-                             
+                                  
                                 ]),
+                                
                                 Fieldset::make('Univeristy Details')->schema([
                               
-                                        Grid::make(3)->schema([
-                                            
+                                        Grid::make(4)->schema([
+    
                                             Select::make('school_year_id')
                                             ->label('School year')
-                                            ->options(
-                                                SchoolYear::query()
-                                                ->latest()
-                                                ->get(['id', 'from', 'to'])
-                                                ->mapWithKeys(fn ($schoolYear) => [$schoolYear->id => $schoolYear->from . ' - ' . $schoolYear->to])
-                                                ->all()
-                                            )
+                                            ->options(  SchoolYear::query()
+                                            ->latest()
+                                            ->get(['id', 'from', 'to'])
+                                            ->mapWithKeys(fn ($schoolYear) => [$schoolYear->id => $schoolYear->from . ' - ' . $schoolYear->to])
+                                            ->all())
                                             ->required()
                                             ->searchable()
-                                            ->columnSpan(3),
-                                            Select::make('role')
-                                            ->label('Account Role')
-                                            ->options(Role::query()->where('name', '!=', 'admin')->pluck('name', 'id')->map(function($name){
-                                                return ucfirst($name);
-                                            }))
-                                            ->reactive()
-                                            ->required(),
-                                           
-    
-                                       Select::make('department')
+                                            
+                                            ->columnSpan(4),
+                                        
+                                            Select::make('department')
                                             ->label('Department')
                                             ->options(Department::query()->pluck('name', 'id'))
                                             ->required()
@@ -299,7 +318,12 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
                                                     $set('course',   $course->id);
                                                 }
                                             })
-                                            ->columnSpan(fn (Closure $get) => (int)$get('role') === 1 ? 2: 1),
+                                            ->columnSpan(fn (Closure $get) => (int)$get('role') === 1 ? 4: 4),
+                                          
+                                           
+    
+                                   
+                                      
                                             
     
                                        Select::make('course')
@@ -310,8 +334,28 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
                                             ->required()
                                             ->searchable()
                                             ->reactive()
+                                            ->afterStateUpdated(function (Closure $set, $state, $get) {
+                                                $section =Section::query()
+                                                    ->where('course_id', $state)
+                                                    ->first(['name', 'id']);    
+                                                if (!empty($section)) {
+                                                    $set('section',   $section->id);
+                                                }
+                                            })
+                                            ->columnSpan(4)
                                             ->hidden(fn (Closure $get) => (int)$get('role') === 1)
                                             ,
+                                            Select::make('section')
+                                                 ->label('Section')
+                                                 ->options(function ($get) {
+                                                    return Section::query()->where('course_id', $get('course'))->pluck('name', 'id');
+                                                 })
+                                                 ->required()
+                                                 ->searchable()
+                                                 ->reactive()
+                                                 ->columnSpan(4)
+                                                 ->hidden(fn (Closure $get) => (int)$get('role') === 1)
+    
     
                        
         
@@ -324,9 +368,9 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
                                 ->schema([
                                     Grid::make(3)
                                     ->schema([
-                                        TextInput::make('guardian_first_name')->label('First Name')->required(),
-                                        TextInput::make('guardian_last_name')->label('Last Name')->required(),
-                                        TextInput::make('guardian_phone_number')->label('Phone Number')->required(),
+                                        TextInput::make('guardian_first_name')->label('First Name'),
+                                        TextInput::make('guardian_last_name')->label('Last Name'),
+                                        TextInput::make('guardian_phone_number')->label('Phone Number'),
                                     ]),
                                 ])->hidden(fn (Closure $get) => (int)$get('role') === 1),
     
@@ -372,6 +416,7 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
                             'school_year_id' => (int)$data['school_year_id'],
                             'department_id' => (int)$data['department'],
                             'course_id' => (int)$data['course'],
+                            'section_id' => (int)$data['section'],
                             'profile_path' => $data['profile_path'],
                         ];
 
@@ -381,6 +426,7 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
                             'last_name' => $data['guardian_last_name'],
                             'phone_number' => $data['guardian_phone_number'],
                         ]);
+                        
                         
                     }else{
                         $accountdata = [
@@ -416,20 +462,32 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
 
                     Fieldset::make('Member Details')
                         ->schema([
-
-                            TextInput::make('id_number')->label('ID Number')->unique()->required()->columnSpan(2),
-
+                            Grid::make(4)
+                            ->schema([
+                                TextInput::make('id_number')->label('ID Number')->unique()->required()->columnSpan(3),
+                                Select::make('role')
+                                ->label('Account Role')
+                                ->options(Role::query()->where('name', '!=', 'admin')->pluck('name', 'id')->map(function($name){
+                                    return ucfirst($name);
+                                }))
+                                ->reactive()
+                                ->required()
+                                ->columnSpan(1)
+                            ]),
+                           
+                            
                             Grid::make(3)
                                 ->schema([
                                     TextInput::make('first_name')->label('First Name')->required(),
                                     TextInput::make('middle_name')->label('Middle Initial')->required(),
                                     TextInput::make('last_name')->label('Last Name')->required(),
                                 ]),
-                         
+                              
                             ]),
+                            
                             Fieldset::make('Univeristy Details')->schema([
                           
-                                    Grid::make(3)->schema([
+                                    Grid::make(4)->schema([
 
                                         Select::make('school_year_id')
                                         ->label('School year')
@@ -441,18 +499,9 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
                                         ->required()
                                         ->searchable()
                                         
-                                        ->columnSpan(3),
-                                        Select::make('role')
-                                        ->label('Account Role')
-                                        ->options(Role::query()->where('name', '!=', 'admin')->pluck('name', 'id')->map(function($name){
-                                            return ucfirst($name);
-                                        }))
-                                        ->reactive()
-                                        ->required(),
-                                       
-
-                               
-                                   Select::make('department')
+                                        ->columnSpan(4),
+                                    
+                                        Select::make('department')
                                         ->label('Department')
                                         ->options(Department::query()->pluck('name', 'id'))
                                         ->required()
@@ -466,7 +515,12 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
                                                 $set('course',   $course->id);
                                             }
                                         })
-                                        ->columnSpan(fn (Closure $get) => (int)$get('role') === 1 ? 2: 1),
+                                        ->columnSpan(fn (Closure $get) => (int)$get('role') === 1 ? 4: 4),
+                                      
+                                       
+
+                               
+                                  
                                         
 
                                    Select::make('course')
@@ -477,8 +531,28 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
                                         ->required()
                                         ->searchable()
                                         ->reactive()
+                                        ->afterStateUpdated(function (Closure $set, $state, $get) {
+                                            $section =Section::query()
+                                                ->where('course_id', $state)
+                                                ->first(['name', 'id']);    
+                                            if (!empty($section)) {
+                                                $set('section',   $section->id);
+                                            }
+                                        })
+                                        ->columnSpan(4)
                                         ->hidden(fn (Closure $get) => (int)$get('role') === 1)
                                         ,
+                                        Select::make('section')
+                                             ->label('Section')
+                                             ->options(function ($get) {
+                                                return Section::query()->where('course_id', $get('course'))->pluck('name', 'id');
+                                             })
+                                             ->required()
+                                             ->searchable()
+                                             ->reactive()
+                                             ->columnSpan(4)
+                                             ->hidden(fn (Closure $get) => (int)$get('role') === 1)
+
 
                    
     

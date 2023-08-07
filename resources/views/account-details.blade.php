@@ -129,12 +129,15 @@
             <h3 class="text-lg font-medium text-gray-900 capitalize" >
                 {{$account->course->name ?? ''}}
         </h3>
+            <h3 class="text-lg font-medium text-gray-900 capitalize" >
+                {{$account->section->name ?? ''}}
+        </h3>
             <dl class="grid grid-cols-1 gap-y-8 border-b border-gray-200 py-8 sm:grid-cols-2 sm:gap-x-6 sm:py-6 md:py-10">
               <div>
                 <dt class="font-medium text-lg text-gray-900">Guadian</dt>
                 <dd class="mt-3  text-gray-500">
-                  <p class="block text-md capitalize">{{$account->guardian->first_name}} {{$account->guardian->last_name}}  </p>
-                  <p class="block text-md">{{$account->guardian->phone_number}}</p>
+                  <p class="block text-md capitalize">{{$account->guardian->first_name ?? ''}} {{$account->guardian->last_name ?? ''}}  </p>
+                  <p class="block text-md">{{$account->guardian->phone_number ?? ''}}</p>
                 </dd>
               </div>
              

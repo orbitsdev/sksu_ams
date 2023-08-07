@@ -14,19 +14,25 @@ return new class extends Migration
         Schema::create('logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('login_id')->nullable();
+            $table->string('first_name')->nullable();
+            $table->string('last_name')->nullable();
+            $table->string('middle_name')->nullable();
+            $table->string('campus_name')->nullable();
+            $table->string('department_name')->nullable();
+            $table->string('course_name')->nullable();
+            $table->string('section_name')->nullable();
+            $table->string('guardian_first_name')->nullable();
+            $table->string('guardian_last_name')->nullable();
+            $table->string('guardian_number')->nullable();
             $table->string('role_name')->nullable();
-            $table->json('school_year')->nullable();
-            $table->json('account')->nullable();
-            $table->json('guardian')->nullable();
-            // $table->string('first_name')->nullable();
-            // $table->string('last_name')->nullable();
-            // $table->string('middle_name')->nullable();
-            // $table->string('campus_name')->nullable();
-            // $table->string('department_name')->nullable();
-            // $table->string('course_name')->nullable();
-            // $table->string('section_name')->nullable();
-            // $table->string('guardian_name')->nullable();
-            // $table->string('guardian_number')->nullable();
+            // $table->timestamp('login_time')->nullable();
+            // $table->timestamp('logout_time')->nullable();
+            
+            //json
+            
+            //$table->json('guardian')->nullable();
+            // $table->json('school_year')->nullable();
+            // $table->json('account')->nullable();
             $table->timestamps();
         });
     }

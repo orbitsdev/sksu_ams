@@ -153,13 +153,32 @@ class Index extends Component
         $newLogoutRecord = $newLoginRecord->logout()->create(['status'=> 'Not Logout']);
          $this->account = Account::where('id_number', $this->idnumber)->first();
 
-    $newLog = Log::create([
-        'login_id' => $newLoginRecord->id,
-        'role_name' => $this->account->role->name,
-        'school_year' => $this->recordDay->schoolYear,
-        'account' => $this->account,
-        'guardian' => $this->account->guardian,
-    ]);
+        //  if($this->account->role->name == 'student'){
+        //     $accountdata = [
+        //     'login_id'=> $newLoginRecord->id,
+        //     'first_name' => $this->account->first_name,
+        //     'last_name' => $this->account->last_name,
+        //     'middle_name' => $this->account->middle_name,
+        //     'campus_name'=> $this->account->campus->name,
+        //     'department_name'=> $this->account->department->name,
+        //     'course_name'=> $this->account->course->name,
+        //     'section_name'=> $this->account->section->name, 
+        //     'guardian_first_name'=> $this->account->guardian->first_name , 
+        //     'guardian_last_name'=> $this->account->guardian->last_name , 
+        //     'guardian_number'=> $this->account->guardian->phone_number, 
+        //     'role_name'=> $this->account->role->name, 
+        //     ];
+        //  }else{
+        //     $accountdata = [
+        //         'login_id'=> $newLoginRecord->id,
+        //         'first_name' => $this->account->first_name,
+        //         'last_name' => $this->account->last_name,
+        //         'middle_name' => $this->account->middle_name,
+        //         'department_name'=> $this->account->department->name,
+        //         'role_name'=> $this->account->role->name, 
+        //         ];
+        //  }  
+        // $newLog = Log::create($accountdata);
 
     $this->isSuccess = true;
         

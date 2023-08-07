@@ -77,6 +77,9 @@ class Account extends Model
     public function course(){
         return $this->belongsTo(Course::class);
     }
+    public function section(){
+        return $this->belongsTo(Section::class);
+    }
 
 
 
