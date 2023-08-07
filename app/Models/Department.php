@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Campus;
 use App\Models\Course;
+use App\Models\Account;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,6 +18,9 @@ class Department extends Model
     public function courses()
     {
         return $this->hasMany(Course::class);
+    }
+    public function course(){
+        return $this->hasOne(Course::class);
     }
 
     public function campus(){
@@ -40,6 +44,11 @@ class Department extends Model
         $department->generateSlug();
     });
 }
+
+public function accounts(){
+    return $this->hasMany(Account::class);
+}
+
 
     
  public function generateSlug()

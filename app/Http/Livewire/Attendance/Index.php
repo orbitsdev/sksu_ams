@@ -30,12 +30,20 @@ class Index extends Component
     }
 
 
+    // public function updatingidnumber(){
+    //     if(!empty($this->idnumber)){
+    //         $this->login();
+    //     }
+    // }
+
+
     public function render()
     {
         return view('livewire.attendance.index');
     }
 
     public function login(){
+      
 
 
        
@@ -43,7 +51,8 @@ class Index extends Component
         try{
             DB::beginTransaction();
 
-            $this->account = Account::where('id_number', $this->idnumber)->where('password', $this->password)->first();
+            // $this->account = Account::where('id_number', $this->idnumber)->first();
+            $this->account = Account::where('id_number', $this->idnumber)->first();
          
             if(!empty($this->account)){
 
@@ -112,14 +121,14 @@ class Index extends Component
     public function createDayLoginRecordWithLogout(){
         $newLoginRecord = $this->recordDay->logins()->create(['account_id' => $this->account->id,]);
         $newLogoutRecord = $newLoginRecord->logout()->create(['status'=> 'Not Logout']);
-        $this->account = Account::where('id_number', $this->idnumber)->where('password', $this->password)->first();
+        $this->account = Account::where('id_number', $this->idnumber)->first();
         $this->isSuccess = true;
     }
 
     
     public function updateLogoutRecordStatus($logoutRecord){
         $logoutRecord->update(['status' => 'Logged out']);
-        $this->account = Account::where('id_number', $this->idnumber)->where('password', $this->password)->first();
+        $this->account = Account::where('id_number', $this->idnumber)->first();
         $this->isSuccess = true;
     }
 
@@ -133,7 +142,7 @@ class Index extends Component
 
     public function createLogoutRecord($studentLoginRecord){
         $newLogoutRecord = $studentLoginRecord->logout()->create(['status'=> 'Logged out']);
-        $this->account = Account::where('id_number', $this->idnumber)->where('password', $this->password)->first();
+        $this->account = Account::where('id_number', $this->idnumber)->first();
         $this->isSuccess = true;
     }
 

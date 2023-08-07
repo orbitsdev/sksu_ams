@@ -10,9 +10,14 @@ use App\Models\Section;
 use Livewire\Component;
 use App\Models\Department;
 use WireUi\Traits\Actions;
+use App\Imports\SectionImport;
+use App\Exports\SectionsExport;
 use Filament\Tables\Actions\Action;
+use Maatwebsite\Excel\Facades\Excel;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Actions\EditAction;
+use Illuminate\Support\Facades\Storage;
+use Filament\Forms\Components\FileUpload;
 use Filament\Notifications\Notification; 
 use Filament\Tables\Actions\DeleteAction;
 use Illuminate\Contracts\Database\Query\Builder;
@@ -50,7 +55,9 @@ class ManageSection extends Component implements Tables\Contracts\HasTable, Form
         return [
             // Tables\Columns\TextColumn::make('slug'),
             Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
-            Tables\Columns\TextColumn::make('course.name')->sortable()->searchable(),
+            Tables\Columns\TextColumn::make('course.name')->sortable()
+            ->formatStateUsing(fn ($state): string => $state ? $state : 'N/A' )
+            ->searchable(),
         ];
     }
 
@@ -63,6 +70,46 @@ class ManageSection extends Component implements Tables\Contracts\HasTable, Form
     protected function getTableHeaderActions(): array
     {
         return [
+
+            Action::make('Import ')
+            ->icon('heroicon-o-cloud-upload')
+            ->action(function (array $data): void {
+
+            $file  = Storage::disk('public')->path($data['file']);
+           
+            Excel::import(new SectionImport, $file);
+
+            if (Storage::disk('public')->exists($data['file'])) {
+
+                Storage::disk('public')->delete($data['file']);
+            }
+
+            Notification::make() 
+            ->title('Imported successfully')
+            ->success()
+            ->send(); 
+
+            
+        })->icon('heroicon-o-save')->form([
+            FileUpload::make('file')->acceptedFileTypes(['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/csv', 'text/csv', 'text/plain'])->disk('public')->directory('imports')->label('Excel File'),
+        ]) ->modalHeading('Notice')
+        ->modalSubheading("Please ensure that the file you are importing is in the correct format. You can download the file from the table menu. It is important to note that existing names will be ignored during the data import process into the system"),
+            Tables\Actions\ActionGroup::make([
+
+               
+            Action::make('download')->icon('heroicon-s-download')->label('Download Template ')
+            ->action(function(){
+
+                // return Excel::download(new CampusExport, 'campus_template.xlsx');
+                return Excel::download(new SectionsExport, 'sections_template.xlsx');
+            })
+            ->requiresConfirmation()
+            ->modalHeading('Notice')
+            ->modalSubheading("This template is an Excel data file that contains the correct structure for importing campuses. Please refrain from altering the file's structure. Only add your data following the provided examples. It's important to note that modifying the structure may result in errors when importing the data into the system.")
+            ->modalButton('Ok, Download'),
+               
+                
+            ]),
             Action::make('create')->button()->icon('heroicon-s-plus')->label('Create New Section')->action(function($data){
                 // dd($data);
 
@@ -119,7 +166,7 @@ class ManageSection extends Component implements Tables\Contracts\HasTable, Form
                 })
                 ->mountUsing(fn (Forms\ComponentContainer $form, Section $record) => $form->fill([
                     'name' => $record->name,
-                    'course_id' => $record->course->id,
+                    'course_id' => $record->course->id ?? null,
                 ]))
                 ->form([
                     Select::make('course_id')

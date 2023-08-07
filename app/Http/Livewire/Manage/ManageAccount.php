@@ -17,7 +17,9 @@ use Illuminate\Support\Str;
 use Filament\Forms\Components\Grid;
 use Filament\Tables\Actions\Action;
 use Illuminate\Contracts\View\View;
+use Filament\Forms\Components\Select;
 use Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Components\Fieldset;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Support\Facades\Storage;
@@ -39,9 +41,10 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
     use Forms\Concerns\InteractsWithForms;
     use Actions;
 
-    
-    public function showSuccess($header ='Data saved', $content="Your data was successfully save"){
-       
+
+    public function showSuccess($header = 'Data saved', $content = "Your data was successfully save")
+    {
+
         $this->dialog()->success(
 
             $title = $header,
@@ -49,7 +52,6 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
             $description = $content
 
         );
-       
     }
 
 
@@ -70,16 +72,19 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
         return [
             ImageColumn::make('profile_path')->disk('public')->height(120)->url(function (Account $record) {
                 return Storage::url($record->profile_path);
-            })->openUrlInNewTab(),
+            })->openUrlInNewTab()->defaultImageUrl(url('/images/placeholder.png')),
             // Tables\Columns\TextColumn::make('slug'),
             TextColumn::make('id_number')->searchable(),
-            TextColumn::make('first_name')->formatStateUsing(fn (string $state): string => Str::ucfirst($state))->searchable(),
-            TextColumn::make('last_name')->formatStateUsing(fn (string $state): string => Str::ucfirst($state))->searchable(),
-            TextColumn::make('course.name'),
+            TextColumn::make('Name')->formatStateUsing(fn (Account $record): string => Str::upper($record->first_name. ' '. $record->last_name . ' ,'.$record->middle_name ) )    ->searchable(query: function (Builder $query, string $search): Builder {
+                return $query
+                    ->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%");
+            }),
             TextColumn::make('role.name')->formatStateUsing(fn (string $state): string => Str::ucfirst($state)),
+            TextColumn::make('department.name')->formatStateUsing(fn (string $state): string => Str::ucfirst($state)),
+           
             // TextColumn::make('course.department.name'),
             // TextColumn::make('')->searchable(),
-            TextColumn::make('password'),
         ];
     }
 
@@ -96,105 +101,207 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
 
             Tables\Actions\ActionGroup::make([
 
-                        
-        Action::make('View')->icon('heroicon-s-eye')->label('View Profile')
-        ->url(fn (Account $record): string => route('account.details', $record)),
 
-                EditAction::make('edit')->action(function(Account $record, array $data){
-                  
+                Action::make('View')->icon('heroicon-s-eye')->label('View Profile')
+                    ->url(fn (Account $record): string => route('account.details', $record)),
 
-                    if(!empty($data['profile_path'])){
-                       
-                       $oldpic = $record->profile_path;
+                EditAction::make('edit')->action(function (Account $record, array $data) {
+                    if (!empty($data['profile_path']) && $data['profile_path'] != $record->profile_path) {
+                        $oldpic = $record->profile_path;
                         $record->update([
                             'profile_path' => $data['profile_path'],
                         ]);
 
-                        if(Storage::disk('public')->exists($oldpic)){
-
-                            Storage::disk('public')->delete($oldpic);
-                        }
-
-
+                  
                         
+                        if(!empty($oldpic)) {
 
-
-                    }
-
-                    $record->update([
-                        'id_number' => $data['id_number'],
-                        'first_name' => $data['first_name'],
-                        'last_name' => $data['last_name'],
-                        'role_id' =>(int)$data['role'],
-                        'course_id' => (int)$data['course'],
-                        'password' => $data['password'],
-                    ]);
-
-                    $record->generateSlug();
-                    $record->save();
-                    $this->showSuccess('Account Updated', 'Account was successfully updated');
-
-                })
-                ->label('Update')
-                ->mountUsing(function (Forms\ComponentContainer $form, Account $record) {
-                    
-                    $form->fill([
-                        'department' => $record->course->department_id,
-                        'id_number' =>  $record->id_number,
-                        'first_name' =>$record->first_name, 
-                        'last_name' => $record->last_name,
-                        'role' => $record->role_id,
-                        'course' =>  $record->course_id,
-                        'password' =>  $record->password,
-                        // 'profile_path' => $record->profile_path,
-                    ]);
-                }
-                )
-                ->form([
-                    TextInput::make('id_number')->label('ID Number')->required(),
-
-                    Grid::make(2)
-                        ->schema([
-                            TextInput::make('first_name')->label('First name')->required(),
-                            TextInput::make('last_name')->label('Last name')->required(),
-                        ]),
-                    Forms\Components\Select::make('role')
-                        ->label('Account Role')
-                        ->options(Role::query()->where('name', '!=', 'admin')->pluck('name', 'id'))->required(),
-                    Forms\Components\Select::make('department')
-                        ->label('Department')
-                        ->options(Department::query()->whereHas('courses')->pluck('name', 'id'))->required()->searchable()->reactive()->afterStateUpdated(function (Closure $set, $state ,$get) {
-                            $course = Course::query()
-                            ->where('department_id', $state)
-                            ->first(['name', 'id']);
-                        
-                           
-                          
-                            if(!empty($course)){
-                                $set('course',   $course->id);
+                            // Assuming $oldpic contains only the file path relative to the public disk (e.g., 'profile/pic.jpg')
+                            if (Storage::disk('public')->exists($oldpic)) {
+                                
+                                Storage::disk('public')->delete($oldpic);
                             }
-                        }),
-                    Forms\Components\Select::make('course')
-                        ->label('Course')
-                        ->options(function($get){
-                           return Course::query()->where('department_id', $get('department'))->pluck('name', 'id');
-                        })->required()->searchable()->reactive(),
-                    TextInput::make('password')->label('Password')->required(),
+                        }
+                    }
+                    
+                    if ((int)$data['role'] != 1) {
+                        $accountdata = [
+                            'id_number' => $data['id_number'],
+                            'first_name' => $data['first_name'],
+                            'last_name' => $data['last_name'],
+                            'middle_name' => $data['middle_name'],
+                            'role_id' => (int)$data['role'],
+                            'department_id' => (int)$data['department'],
+                            'course_id' => (int)$data['course'],
+                            'profile_path' => $data['profile_path'],
+                        ];
 
-                    FileUpload::make('profile_path')
+                        $record->guardian()->update([
+                            'first_name' => $data['guardian_first_name'],
+                            'last_name' => $data['guardian_last_name'],
+                            'phone_number' => $data['guardian_phone_number'],
+                        ]);
+
+                        // $course = Course::where('department_id', $data['department'])->first();
+                        
+                        // if ($course) {
+                        //     // If the course is found, update the attributes directly.
+                        //     $course->update(['id' => (int)$data['course'] ]);
+                        // }
+                       
+                        
+                    } else {
+                        $accountdata = [
+                            'id_number' => $data['id_number'],
+                            'first_name' => $data['first_name'],
+                            'last_name' => $data['last_name'],
+                            'middle_name' => $data['middle_name'],
+                            'role_id' => (int)$data['role'],
+                            'department_id' => (int)$data['department'],
+                            'profile_path' => $data['profile_path'],
+                        ];
+                    }
+                    
+                    if ($record) {
+                        $record->update($accountdata);
+                        $this->showSuccess('Account Updated', 'Account was successfully updated');
+                    } else {
+                        // Handle the case where the account data is not valid or missing.
+                        // You can show an error message or take appropriate action.
+                    }
+                    
+                    
+                })
+                    ->label('Update')
+                    ->mountUsing(
+                        function (Forms\ComponentContainer $form, Account $record) {
+                            
+                     
+                            
+                          
+
+                            if($record->role_id != 1){
+                           
+                            $form->fill([
+                                'department' => $record->department_id ?? null,
+                                'course' => $record->course->id ?? null,
+                                'id_number' =>  $record->id_number,
+                                'first_name' => $record->first_name,
+                                'last_name' => $record->last_name,
+                                'middle_name' => $record->middle_name,
+                                'role' => $record->role_id,
+                                'profile_path' => $record->profile_path,
+                                'guardian_first_name' => $record->guardian->first_name,
+                                'guardian_last_name' => $record->guardian->last_name,
+                                'guardian_phone_number' => $record->guardian->phone_number,
+
+                            ]);
+                            }else{  
+
+                                $form->fill([
+                                    'department' => $record->department_id ?? null,
+                                    'id_number' =>  $record->id_number,
+                                    'first_name' => $record->first_name,
+                                    'last_name' => $record->last_name,
+                                    'middle_name' => $record->middle_name,
+                                    'role' => $record->role_id,
+                                    'profile_path' => $record->profile_path,
+                                ]);
+
+                            }
+
+
+                        }
+                    )
+                    ->form([
+                        FileUpload::make('profile_path')
                         ->image()
                         ->disk('public')
                         ->label('Profile Photo')
-                        ->directory('user-profile') ->maxSize(10240)
-                        
-                ]),
+                        ->directory('user-profile')
+                        ->columnSpan(2)->avatar(),
+    
+                        Fieldset::make('Member Details')
+                            ->schema([
+    
+                                TextInput::make('id_number')->label('ID Number')->required()->columnSpan(2),
+    
+                                Grid::make(3)
+                                    ->schema([
+                                        TextInput::make('first_name')->label('First Name')->required(),
+                                        TextInput::make('middle_name')->label('Middle Initial')->required(),
+                                        TextInput::make('last_name')->label('Last Name')->required(),
+                                    ]),
+                             
+                                ]),
+                                Fieldset::make('Univeristy Details')->schema([
+                              
+                                        Grid::make(3)->schema([
+                                            Forms\Components\Select::make('role')
+                                            ->label('Account Role')
+                                            ->options(Role::query()->where('name', '!=', 'admin')->pluck('name', 'id')->map(function($name){
+                                                return ucfirst($name);
+                                            }))
+                                            ->reactive()
+                                            ->required(),
+                                           
+    
+                                       Select::make('department')
+                                            ->label('Department')
+                                            ->options(Department::query()->pluck('name', 'id'))
+                                            ->required()
+                                            ->searchable()
+                                            ->reactive()
+                                            ->afterStateUpdated(function (Closure $set, $state, $get) {
+                                                $course = Course::query()
+                                                    ->where('department_id', $state)
+                                                    ->first(['name', 'id']);    
+                                                if (!empty($course)) {
+                                                    $set('course',   $course->id);
+                                                }
+                                            })
+                                            ->columnSpan(fn (Closure $get) => (int)$get('role') === 1 ? 2: 1),
+                                            
+    
+                                       Select::make('course')
+                                            ->label('Course')
+                                            ->options(function ($get) {
+                                                return Course::query()->where('department_id', $get('department'))->pluck('name', 'id');
+                                            })
+                                            ->required()
+                                            ->searchable()
+                                            ->reactive()
+                                            ->hidden(fn (Closure $get) => (int)$get('role') === 1)
+                                            ,
+    
+                       
+        
+                            ]),
+        
+                        ]),
+                                
+                       
+                                Fieldset::make('Guardian Details')
+                                ->schema([
+                                    Grid::make(3)
+                                    ->schema([
+                                        TextInput::make('guardian_first_name')->label('First Name')->required(),
+                                        TextInput::make('guardian_last_name')->label('Last Name')->required(),
+                                        TextInput::make('guardian_phone_number')->label('Phone Number')->required(),
+                                    ]),
+                                ])->hidden(fn (Closure $get) => (int)$get('role') === 1),
+    
+
+                    ]),
                 DeleteAction::make('Delete')->button()->label('Delete')->before(function (Account $record) {
+                    if(!empty($record->profile_path) ){
 
-                    if(Storage::disk('public')->exists($record->profile_path)){
-
-                        Storage::disk('public')->delete($record->profile_path);
+                        if (Storage::disk('public')->exists($record->profile_path ?? '')) {
+                            
+                            Storage::disk('public')->delete($record->profile_path);
+                        }
+                        $record->delete();
                     }
-                    $record->delete();
                     $this->showSuccess('Account Deleted', 'Account was successfully deleted');
                 }),
             ]),
@@ -210,70 +317,136 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
 
             Action::make('Create New')
                 ->button()
-                ->label('Create New')
+                ->label('Create New Member')
                 ->icon('heroicon-s-plus')
-                
-                ->action(function ( array $data): void {
-                    $accountdata = [
-                        'id_number' => $data['id_number'],
-                        'first_name' => $data['first_name'],
-                        'last_name' => $data['last_name'],
-                        'role_id' =>(int)$data['role'],
-                        'course_id' => (int)$data['course'],
-                        'password' => $data['password'],
-                        'profile_path' => $data['profile_path'],
-                    ];
 
-                  $new_account =   Account::create($accountdata);
-                  $new_account->generateSlug();
-                  $new_account->save();
-                
-                 $this->showSuccess('Account Saved', 'Account was successfully created');
+                ->action(function (array $data): void {
+                  
+                    if((int)$data['role'] != 1){
+                         
+                        $accountdata = [
+                            'id_number' => $data['id_number'],
+                            'first_name' => $data['first_name'],
+                            'last_name' => $data['last_name'],
+                            'middle_name' => $data['middle_name'],
+                            'role_id' => (int)$data['role'],
+                            'department_id' => (int)$data['department'],
+                            'course_id' => (int)$data['course'],
+                            'profile_path' => $data['profile_path'],
+                        ];
 
+                        $new_account =   Account::create($accountdata);
+                        $guarddian =  $new_account->guardian()->create([
+                            'first_name' => $data['guardian_first_name'],
+                            'last_name' => $data['guardian_last_name'],
+                            'phone_number' => $data['guardian_phone_number'],
+                        ]);
+                        
+                    }else{
+                        $accountdata = [
+                            'id_number' => $data['id_number'],
+                            'first_name' => $data['first_name'],
+                            'last_name' => $data['last_name'],
+                            'middle_name' => $data['middle_name'],
+
+                            'role_id' => (int)$data['role'],
+                            'department_id' => (int)$data['department'],
+                            'profile_path' => $data['profile_path'],
+                        ];
+                        
+                        
+                        $new_account =   Account::create($accountdata);
+
+                    
+                    }
+                   
+                    
+
+                    $this->showSuccess('Account Saved', 'Account was successfully created');
                 })
                 ->form([
-                    TextInput::make('id_number')->label('ID Number')->unique()->required(),
-
-                    Grid::make(2)
-                        ->schema([
-                            TextInput::make('first_name')->label('First name')->required(),
-                            TextInput::make('last_name')->label('Last name')->required(),
-                        ]),
-                    Forms\Components\Select::make('role')
-                        ->label('Account Role')
-                        ->options(Role::query()->where('name', '!=', 'admin')->pluck('name', 'id'))->required(),
-                    Forms\Components\Select::make('department')
-                        ->label('Department')
-                        ->options(Department::query()->whereHas('courses')->pluck('name', 'id'))->required()->searchable()->reactive()->afterStateUpdated(function (Closure $set, $state ,$get) {
-                            $course = Course::query()
-                            ->where('department_id', $state)
-                            ->first(['name', 'id']);
-                        
-                           
-                          
-                            if(!empty($course)){
-                                $set('course',   $course->id);
-                            }
-                        }),
-                    Forms\Components\Select::make('course')
-                        ->label('Course')
-                        ->options(function($get){
-                           return Course::query()->where('department_id', $get('department'))->pluck('name', 'id');
-                        })->required()->searchable()->reactive(),
-                    TextInput::make('password')->label('Password')->required(),
 
                     FileUpload::make('profile_path')
-                        ->image()
-                        ->disk('public')
-                        ->label('Profile Photo')
-                        ->directory('user-profile')
-                        ->required()
-        
-                ])
-                ->button()
-                ->modalHeading('Create new account'),
-        
+                    ->image()
+                    ->disk('public')
+                    ->label('Profile Photo')
+                    ->directory('user-profile')
+                    ->columnSpan(2)->avatar(),
 
+                    Fieldset::make('Member Details')
+                        ->schema([
+
+                            TextInput::make('id_number')->label('ID Number')->unique()->required()->columnSpan(2),
+
+                            Grid::make(3)
+                                ->schema([
+                                    TextInput::make('first_name')->label('First Name')->required(),
+                                    TextInput::make('middle_name')->label('Middle Initial')->required(),
+                                    TextInput::make('last_name')->label('Last Name')->required(),
+                                ]),
+                         
+                            ]),
+                            Fieldset::make('Univeristy Details')->schema([
+                          
+                                    Grid::make(3)->schema([
+                                        Forms\Components\Select::make('role')
+                                        ->label('Account Role')
+                                        ->options(Role::query()->where('name', '!=', 'admin')->pluck('name', 'id')->map(function($name){
+                                            return ucfirst($name);
+                                        }))
+                                        ->reactive()
+                                        ->required(),
+                                       
+
+                                   Select::make('department')
+                                        ->label('Department')
+                                        ->options(Department::query()->pluck('name', 'id'))
+                                        ->required()
+                                        ->searchable()
+                                        ->reactive()
+                                        ->afterStateUpdated(function (Closure $set, $state, $get) {
+                                            $course = Course::query()
+                                                ->where('department_id', $state)
+                                                ->first(['name', 'id']);    
+                                            if (!empty($course)) {
+                                                $set('course',   $course->id);
+                                            }
+                                        })
+                                        ->columnSpan(fn (Closure $get) => (int)$get('role') === 1 ? 2: 1),
+                                        
+
+                                   Select::make('course')
+                                        ->label('Course')
+                                        ->options(function ($get) {
+                                            return Course::query()->where('department_id', $get('department'))->pluck('name', 'id');
+                                        })
+                                        ->required()
+                                        ->searchable()
+                                        ->reactive()
+                                        ->hidden(fn (Closure $get) => (int)$get('role') === 1)
+                                        ,
+
+                   
+    
+                        ]),
+    
+                    ]),
+                            
+                   
+                            Fieldset::make('Guardian Details')
+                            ->schema([
+                                Grid::make(3)
+                                ->schema([
+                                    TextInput::make('guardian_first_name')->label('First Name'),
+                                    TextInput::make('guardian_last_name')->label('Last Name'),
+                                    TextInput::make('guardian_phone_number')->label('Phone Number'),
+                                ]),
+                            ])->hidden(fn (Closure $get) => (int)$get('role') === 1),
+
+
+                        ])
+                ->button()
+                ->modalHeading('Create new member'),
 
         ];
     }
@@ -282,17 +455,20 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
     {
         return [
             DeleteBulkAction::make()->before(function (Collection $records) {
-                
-                foreach($records as $record){
-                    if(Storage::disk('public')->exists($record->profile_path)){
 
-                        Storage::disk('public')->delete($record->profile_path);
+                foreach ($records as $record) {
+                    if(!empty($record->profile_path) ){
+
+                        if (Storage::disk('public')->exists($record->profile_path ?? '')) {
+    
+                            Storage::disk('public')->delete($record->profile_path);
+                        }
+                        $record->delete();
                     }
-                    $record->delete();
-                }
                 
+                }
             }),
-         
+
         ];
     }
 

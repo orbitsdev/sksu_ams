@@ -66,11 +66,11 @@
                             class="block border-gray-300 active:border-green-600 focus:border-green-600 outline-emerald-500 p-2 mt-1 w-full h-12" />
                     </div>
 
-                    <div class="mt-5">
+                    {{-- <div class="mt-5">
                         <p for="name" class="block font-medium text-sm  text-gray-500"> Password </p>
                         <x-input wire:model="password"
                             class="block  border-gray-300 active:border-green-600 focus:border-green-600 outline-emerald-500 p-2 mt-1 w-full h-12" />
-                    </div>
+                    </div> --}}
 
 
                     <div class="mt-8 flex justify-end">

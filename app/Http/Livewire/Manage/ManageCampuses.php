@@ -93,7 +93,8 @@ class ManageCampuses extends Component implements Tables\Contracts\HasTable
                 ->send();
 
 
-            })->form([
+            })
+            ->form([
                 Forms\Components\TextInput::make('name')
                     ->label('Name')
                     ->unique()
