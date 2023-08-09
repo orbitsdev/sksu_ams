@@ -75,6 +75,19 @@
     
   }
   
+  .okt{
+    color: #166534 !important;
+    border: 1px solid #166534 !important;
+    background: white !important;
+    
+  }
+  .okt:hover{
+    color: #15803d !important;
+    border: 1px solid #15803d !important;
+    background: rgb(237, 238, 237) !important;
+    
+  }
+ 
   .modal-c{
     background: #166534 !important;
     color: white !important;

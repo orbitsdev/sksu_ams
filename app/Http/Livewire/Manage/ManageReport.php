@@ -6,8 +6,10 @@ use App\Models\Log;
 use App\Models\Course;
 use Livewire\Component;
 use App\Models\DayRecord;
+use App\Exports\LogExport;
 use App\Models\Department;
 use App\Models\SchoolYear;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ManageReport extends Component
 {
@@ -215,5 +217,13 @@ class ManageReport extends Component
             'logs'=> $this->logs,
         ]);
     }
+
+    public function export() 
+{
+    // return Excel::download(new LogExport($this->logs), 'log_report.xlsx');
+
+    return Excel::download(new LogExport($this->logs), 'logs_report.xlsx');
+}
+
 
 }

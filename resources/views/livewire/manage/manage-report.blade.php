@@ -77,6 +77,7 @@
     </div>
     <div class="">
         <div class=" max-w-6xl mx-auto  flex justify-end mb-4">
+            <x-button class="okt mr-4" icon="download" outline  spinner="export" wire:click="export"> Download </x-button>
             <x-button class="ok" icon="printer" spinner="print" wire:click="print"> Print</x-button>
         </div>
         <div class=" max-w-6xl print-container mx-auto border-2 border-gray-200">
@@ -144,7 +145,7 @@
                                     </td>
 
                                     <td class="whitespace-nowrap px-3 py-2.5 text-sm text-gray-600">
-                                        {{ $item->department_name ?? '' }}</td>
+                                        {{ $item->department_name ?? '' }} </td>
                                     <td class="whitespace-nowrap px-3 py-2.5 text-sm text-gray-600">
                                         {{ $item->role_name ?? '' }}</td>
                                     <td class="whitespace-nowrap px-3 py-2.5 text-sm text-gray-600">
