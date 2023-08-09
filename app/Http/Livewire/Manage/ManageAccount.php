@@ -396,7 +396,44 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
     protected function getTableHeaderActions(): array
     {
         return [
+            Action::make('Import ')
+            ->icon('heroicon-o-cloud-upload')
+            ->action(function (array $data): void {
 
+            // $file  = Storage::disk('public')->path($data['file']);
+           
+            // Excel::import(new CampusImport, $file);
+
+            // if (Storage::disk('public')->exists($data['file'])) {
+
+            //     Storage::disk('public')->delete($data['file']);
+            // }
+        })->icon('heroicon-o-save')->form([
+            FileUpload::make('file')->acceptedFileTypes(['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/csv', 'text/csv', 'text/plain'])->disk('public')->directory('imports')->label('Excel File'),
+        ]) ->modalHeading('Notice'),
+            Action::make('download')->icon('heroicon-s-download')->label('Download Template ')
+            ->action(function(){
+
+                // return Excel::download(new CampusExport, 'campus_template.xlsx');
+                // return Excel::download(new CampusExport, 'campus_template.xlsx');
+            })
+            ->requiresConfirmation()
+            ->outlined()
+            ->modalHeading('Notice')
+            ->modalSubheading("When importing accounts, it is crucial to adhere to the provided examples and add your data accordingly. Please ensure that the names you assign to members already exist in the database, such as (campus, department, course, section). Be mindful that the names are case-sensitive, so double-check for proper capitalization and spelling.
+
+            Keep in mind that attempting to assign names to campuses, departments, or sections that do not exist will not be saved. Moreover, modifying the structure could lead to errors when importing the data into the system.
+            
+            If you have any questions or need assistance, feel free to reach out. We're here to help!")
+            ->modalButton('Ok, Download'),
+               
+                
+            // Tables\Actions\ActionGroup::make([
+
+               
+              
+            //     ]),
+    
 
             Action::make('Create New')
                 ->button()

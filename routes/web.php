@@ -2,6 +2,7 @@
 
 use App\Models\Account;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TestController;
 use App\Http\Controllers\AttendanceController;
 
 /*
@@ -18,6 +19,32 @@ use App\Http\Controllers\AttendanceController;
 Route::get('/', function () {
     return view('welcome');
 });
+
+
+
+
+
+Route::get('/test', function () {
+
+  
+
+    return view('test');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Route::prefix('attendance')->name('attendance.')->group(function(){
     Route::get('/', [AttendanceController::class, 'index'])->name('index');

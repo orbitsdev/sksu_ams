@@ -25,9 +25,7 @@ return new class extends Migration
             $table->string('guardian_last_name')->nullable();
             $table->string('guardian_number')->nullable();
             $table->string('role_name')->nullable();
-            // $table->timestamp('login_time')->nullable();
-            // $table->timestamp('logout_time')->nullable();
-            
+           
             //json
             
             //$table->json('guardian')->nullable();

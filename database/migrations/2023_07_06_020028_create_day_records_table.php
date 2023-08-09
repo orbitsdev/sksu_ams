@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('day_records', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('school_year_id')->nullable();
             $table->timestamps();
         });
     }

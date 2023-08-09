@@ -17,8 +17,5 @@ class DayRecord extends Model
         return $this->hasMany(Login::class);
     }
 
-    public function schoolYear()
-    {
-        return $this->belongsTo(SchoolYear::class);
-    }
+   
 }

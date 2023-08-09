@@ -57,8 +57,8 @@ class ManageSchoolYear extends Component  implements Tables\Contracts\HasTable
                     ->where('from', 'like', "%{$search}%")->orWhere('to', 'like', "%{$search}%");
             }),
           
-            TextColumn::make('status')->color('danger')
-            ->formatStateUsing(fn (string $state): string => $state ? 'Currently Recording' : ' ' )
+            // TextColumn::make('status')->color('danger')
+            // ->formatStateUsing(fn (string $state): string => $state ? 'Currently Recording' : ' ' )
          
 
         ];
@@ -145,11 +145,11 @@ class ManageSchoolYear extends Component  implements Tables\Contracts\HasTable
                                 return (int)now()->addYear()->format('Y');
                             }),
 
-                            Select::make('status')
-                            ->options([
-                                true => 'Set for Recording',
-                                false => 'Remove for Recording',
-                            ])->columnSpan(2)->default(false)->hidden(),
+                            // Select::make('status')
+                            // ->options([
+                            //     true => 'Set for Recording',
+                            //     false => 'Remove for Recording',
+                            // ])->columnSpan(2)->default(false)->hidden(),
                         // ...
                     ]),
 
@@ -217,40 +217,37 @@ class ManageSchoolYear extends Component  implements Tables\Contracts\HasTable
 
                         DB::beginTransaction();
 
-                        // Check if there's already a record with status = true
-                        $existingTrueRecord = SchoolYear::where('status', true)->first();
+                     
+                        // $existingTrueRecord = SchoolYear::where('status', true)->first();
                     
-                        if ($data['status'] && $existingTrueRecord) {
-                            // There's already a record with status = true, show an error message
+                        // if ($data['status'] && $existingTrueRecord) {
+                        //     // There's already a record with status = true, show an error message
 
-                            $this->dialog()->error(
+                        //     $this->dialog()->error(
 
-                                $title = 'Operation Failed',
+                        //         $title = 'Operation Failed',
                     
-                                $description = 'Operation failed: Another SchoolYear record already has status true.'
+                        //         $description = 'Operation failed: Another SchoolYear record already has status true.'
                     
-                            );
+                        //     );
 
-                            // Notification::make()
-                            // ->title('Operation failed: Another SchoolYear record already has status true.')
-                            // ->danger()
-                            // ->send();
-                             return;
+                           
+                        //      return;
                              
-                        }
+                        // }
                     
                         $record->from = $data['from'];
                         $record->to = $data['to'];
 
 
-                        if(!empty($data['status'])){
+                        // if(!empty($data['status'])){
                          
 
-                            $record->status = (int)$data['status'];
-                        }else{
+                        //     $record->status = (int)$data['status'];
+                        // }else{
                             
-                            $record->status = (int)$data['status'];
-                        }
+                        //     $record->status = (int)$data['status'];
+                        // }
 
 
                         $record->save();
@@ -299,11 +296,11 @@ class ManageSchoolYear extends Component  implements Tables\Contracts\HasTable
                                
                                   
                                     
-                            Select::make('status')
-                            ->options([
-                                true => 'Set for recording',
-                                false => 'Remove for Recording',
-                            ])->columnSpan(2)
+                            // Select::make('status')
+                            // ->options([
+                            //     true => 'Set for recording',
+                            //     false => 'Remove for Recording',
+                            // ])->columnSpan(2)
                             ]),
                     ])->button()->modalHeading('Update Campus'),
 

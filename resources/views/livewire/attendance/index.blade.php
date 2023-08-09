@@ -76,7 +76,7 @@
                     <div class="mt-8 flex justify-end">
                         <x-button wire:click="login" spinner="login"
                             class="sk-button px-[34px] py-[12px]  w-full justify-center ">
-                           Submit
+                            Submit
                         </x-button>
                     </div>
 
@@ -101,59 +101,118 @@
         spacing="p-20">
         @if ($account != null && $recordDay != null)
 
-        @php
-        $accountLoginRecord = $account->logins()->latest()->first();
-        $logoutrecord = $accountLoginRecord->logout;
-        @endphp
+            @php
+                $accountLoginRecord = $account
+                    ->logins()
+                    ->latest()
+                    ->first();
+                // $logoutrecord = $accountLoginRecord->logout;
+            @endphp
             <div class="modal-c rounded-md p-6 relative">
                 <div class="relative">
 
                     <img src="{{ asset('images/sksulogo.png') }}" alt="sksu-logo.png"
-                    class="w-32 h-32 mx-auto absolute top-[-60px] left-0 right-0">
-                   
+                        class="w-32 h-32 mx-auto absolute top-[-60px] left-0 right-0">
+
                 </div>
 
                 <div class="grid grid-cols-2 ">
 
-                  <div class="mt-6 flex-2  flex items-center justify-center h-[300px] w-full  pr-16 ">
-    <div class="w-[400px] h-[300px] rounded relative">
-        @if(!empty($account->profile_path))
-        <a href="{{ Storage::url($account->profile_path) }}" target="_blank">
-            <img src="{{ Storage::url($account->profile_path) }}" alt="profile.jpg" class="h-full w-full object-cover rounded">
-        </a>
-        @else
-        <div  class="h-full w-full  rounded border-4 border-white flex items-center justify-center text-3xl font-semibold"> No Profile </div>
-
-        @endif
-        {{-- Add the role name as text with a gradient background --}}
-        {{-- <div class="absolute top-3 left-3">
+                    <div class="mt-6 flex-2  flex items-center justify-center h-[300px] w-full  pr-16 ">
+                        <div class="w-[400px] h-[300px] rounded relative">
+                            @if (!empty($account->profile_path))
+                                <a href="{{ Storage::url($account->profile_path) }}" target="_blank">
+                                    <img src="{{ Storage::url($account->profile_path) }}" alt="profile.jpg"
+                                        class="h-full w-full object-cover rounded">
+                                </a>
+                            @else
+                                <div
+                                    class="h-full w-full  rounded border-4 border-white flex items-center justify-center text-3xl font-semibold">
+                                    No Profile </div>
+                            @endif
+                            {{-- Add the role name as text with a gradient background --}}
+                            {{-- <div class="absolute top-3 left-3">
             <div class="bg-gradient-to-r from-transparent via-transparent to-black text-transparent inline-block px-4 py-2 rounded">
                 {{$account->role->name}}
             </div>
         </div> --}}
-    </div>
-    {{-- <div  class=" bg-white absolute w-[400px] h-[300px] z-[-1px]"> </div> --}}
-</div>
+                        </div>
+                        {{-- <div  class=" bg-white absolute w-[400px] h-[300px] z-[-1px]"> </div> --}}
+                    </div>
 
 
 
 
                     <div class="mt-2 ">
                         <div class="mm  relative text-center text-white text-xl font-bold uppercase pt-4">
-                            @if( $logoutrecord->status == 'Not Logout')
-                            <div
-                                class="bg-white  rounded-full w-[70px] h-[70px] text-green-700  text-4xl p-1 inline-flex items-center justify-center uppercase">
-                                In
-                            
-                            </div>
-                            @endif  
-                            @if( $logoutrecord->status == 'Logged out')
-                            <div
-                                class="bg-white  rounded-full w-[70px] h-[70px] text-green-700  text-3xl p-1 inline-flex items-center justify-center uppercase">
-                              
-                                Out
-                            </div>
-                            @endif  
+                            {{-- @if (!empty($accountLoginRecord->morning_in) && empty($accountLoginRecord->morning_out) && now()->format('A') == 'AM')
+                                <div
+                                    class="bg-white  rounded-full w-[70px] h-[70px] text-green-700  text-4xl p-1 inline-flex items-center justify-center uppercase">
+                                    In
+                                </div>
+                            @endif
+                            @if (!empty($accountLoginRecord->morning_in) && !empty($accountLoginRecord->morning_out) && now()->format('A') == 'AM')
+                                <div
+                                    class="bg-white  rounded-full w-[70px] h-[70px] text-green-700  text-4xl p-1 inline-flex items-center justify-center uppercase">
+                                    OUT
+
+                                </div>
+                            @endif
+                            @if (!empty($accountLoginRecord->noon_in) && empty($accountLoginRecord->noon_out) && now()->format('A') == 'PM')
+                                <div
+                                    class="bg-white  rounded-full w-[70px] h-[70px] text-green-700  text-3xl p-1 inline-flex items-center justify-center uppercase">
+
+                                    In
+                                </div>
+                            @endif
+                            @if (!empty($accountLoginRecord->noon_in) && !empty($accountLoginRecord->noon_out) && now()->format('A') == 'PM')
+                                <div
+                                    class="bg-white  rounded-full w-[70px] h-[70px] text-green-700  text-4xl p-1 inline-flex items-center justify-center uppercase">
+                                    OUT
+
+                                </div>
+                            @endif --}}
+
+
+                            @if (!empty($accountLoginRecord->morning_in) || !empty($accountLoginRecord->noon_in))
+                                @php
+                                    $currentTime = now()->timezone('Asia/Manila');
+                                    $currentPeriod = $currentTime->format('A');
+                                @endphp
+
+                                @if ($currentPeriod == 'AM')
+                                    @if (!empty($accountLoginRecord->morning_in))
+                                        @if (empty($accountLoginRecord->morning_out))
+                                            <div
+                                                class="bg-white rounded-full w-[70px] h-[70px] text-green-700 text-3xl p-1 inline-flex items-center justify-center uppercase">
+                                                In
+                                            </div>
+                                        @else
+                                            <div
+                                                class="bg-white rounded-full w-[70px] h-[70px] text-green-700 text-3xl p-1 inline-flex items-center justify-center uppercase">
+                                                Out
+                                            </div>
+                                        @endif
+                                    @endif
+                                @elseif ($currentPeriod == 'PM')
+                                    @if (!empty($accountLoginRecord->noon_in))
+                                        @if (empty($accountLoginRecord->noon_out))
+                                            <div
+                                                class="bg-white rounded-full w-[70px] h-[70px] text-green-700 text-3xl p-1 inline-flex items-center justify-center uppercase">
+                                                In
+                                            </div>
+                                        @else
+                                            <div
+                                                class="bg-white rounded-full w-[70px] h-[70px] text-green-700 text-3xl p-1 inline-flex items-center justify-center uppercase">
+                                                Out
+                                            </div>
+                                        @endif
+                                    @endif
+                                @endif
+
+
+                            @endif
+
                         </div>
 
                         <P class="text-4xl font-bold uppercase  ">
@@ -163,22 +222,75 @@
 
                         @if ($accountLoginRecord)
 
-                          
 
-                            @if ($logoutrecord->status == 'Not Logout')
+
+                            {{-- @if (!empty($accountLoginRecord->morning_in) && empty($accountLoginRecord->morning_out) && now()->format('A') == 'AM')
                                 <P class="text-4xl font-bold uppercase  ">
-                                    {{ $accountLoginRecord->created_at->timezone('Asia/Manila')->format('h:i:s A') }}
+                                    {{ $accountLoginRecord->mornin_in->timezone('Asia/Manila')->format('h:i:s A') }}
                                 </P>
                             @endif
-                            @if ($logoutrecord && $logoutrecord->status == 'Logged out')
+                            @if (!empty($accountLoginRecord->morning_in) && !empty($accountLoginRecord->morning_out) && now()->format('A') == 'AM')
                                 <P class="text-4xl font-bold uppercase  ">
-                                    {{ $logoutrecord->updated_at->timezone('Asia/Manila')->format('h:i:s A') }}
-
+                                    {{ $accountLoginRecord->morning_out->timezone('Asia/Manila')->format('h:i:s A') }}
                                 </P>
                             @endif
+
+                            @if (!empty($accountLoginRecord->noon_in) && empty($accountLoginRecord->noon_out) && now()->format('A') == 'PM')
+                            <P class="text-4xl font-bold uppercase  ">
+                                {{ $accountLoginRecord->noon_in->timezone('Asia/Manila')->format('h:i:s A') }}
+
+                            </P>
+                            @endif  
+                            @if (!empty($accountLoginRecord->noon_in) && !empty($accountLoginRecord->noon_out) && now()->format('A') == 'PM')
+                            <P class="text-4xl font-bold uppercase  ">
+                                {{ $logoutrecord->noon_out->timezone('Asia/Manila')->format('h:i:s A') }}
+
+                            </P>
+                            @endif   --}}
+
+
+                            @if (!empty($accountLoginRecord->morning_in) || !empty($accountLoginRecord->noon_in))
+                                @php
+                                    $currentTime = now()->timezone('Asia/Manila');
+                                    $currentPeriod = $currentTime->format('A');
+                                @endphp
+
+                                @if ($currentPeriod == 'AM')
+
+                                    @if (!empty($accountLoginRecord->morning_in) && empty($accountLoginRecord->morning_out))
+                                        <p class="text-4xl font-bold uppercase">
+                                            {{-- {{ $accountLoginRecord->morning_in->timezone('Asia/Manila')->format('h:i:s A') }} --}}
+                                            {{ $accountLoginRecord->morning_in }}
+                                        </p>
+                                    @endif
+                                    @if (!empty($accountLoginRecord->morning_in) && !empty($accountLoginRecord->morning_out))
+                                        <p class="text-4xl font-bold uppercase">
+                                            {{ $accountLoginRecord->morning_out }}
+                                            {{-- {{ $accountLoginRecord->morning_out->timezone('Asia/Manila')->format('h:i:s A') }} --}}
+                                        </p>
+                                    @endif
+                                @elseif ($currentPeriod == 'PM')
+                                    @if (!empty($accountLoginRecord->noon_in) && empty($accountLoginRecord->noon_out))
+                                        <p class="text-4xl font-bold uppercase">
+                                            {{-- {{ $accountLoginRecord->noon_in->timezone('Asia/Manila')->format('h:i:s A') }} --}}
+                                            {{ $accountLoginRecord->noon_in }}
+
+                                        </p>
+                                    @endif
+                                    @if (!empty($accountLoginRecord->noon_in) && !empty($accountLoginRecord->noon_out))
+                                        <p class="text-4xl font-bold uppercase">
+                                            {{ $accountLoginRecord->noon_out }}
+
+                                            {{-- {{ $accountLoginRecord->noon_out->timezone('Asia/Manila')->format('h:i:s A') }} --}}
+                                        </p>
+                                    @endif
+                                @endif
+
+                            @endif
+
                         @endif
 
-                        
+
                         <div class="  mt-6">
                             <P class="text-2xl p-0 font-semibold capitalize">
                                 {{ $account->first_name }} {{ $account->last_name }}
@@ -186,12 +298,12 @@
 
                         </div>
                         <P class="mt-5 text-lg capitalize ">
-                           {{$account->department->name ?? ''}}
+                            {{ $account->department->name ?? '' }}
                         </P>
-                        @if($account->role->name == 'student')
-                        <P class=" text-lg capitalize ">
-                            {{$account->course->name ?? '' }}
-                        </P>
+                        @if ($account->role->name == 'student')
+                            <P class=" text-lg capitalize ">
+                                {{ $account->course->name ?? '' }}
+                            </P>
                         @endif
                         <P class=" text-lg capitalize ">
                             {{ $account->role->name }}
