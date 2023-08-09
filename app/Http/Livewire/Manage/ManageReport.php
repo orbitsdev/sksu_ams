@@ -185,12 +185,30 @@ class ManageReport extends Component
                             $query->where('role_name', 'student');
                     
                         })
+                        ->when($this->from || $this->to, function ($query) {
+                           
+                            $query->whereHas('login', function ($query) {
+                                if ($this->from && $this->to) {
+                                    $from = $this->from . ' 00:00:00'; // Start of selected day
+                                    $to = $this->to . ' 23:59:59';    
+                                    $query->whereBetween('created_at', [$from, $to]);
+                                  
+                                } elseif ($this->from) {
+                                    
+                                    $query->where('created_at', '>=', $this->from);
+                                    
+                                } elseif ($this->to) {
+                                    $query->where('created_at', '<=', $this->to);
+                                }
+                            });
+                        })
                         ->whereHas('login', function($query){
                             // $query->whereNotNull('noon_in')->whereNotNull('noon_out');
                             // $query->whereNotNull('morning_in');
                         })
                         ->latest()
                         ->get();
+                       
         return view('livewire.manage.manage-report', [
             'departments'=> $this->departments,
             'courses'=> $this->courses,
