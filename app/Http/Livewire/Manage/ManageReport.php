@@ -148,9 +148,49 @@ class ManageReport extends Component
              
         }
 
-        $this->logs = Log::latest()->get();
         
-        
+         $this->dayRecord = DayRecord::latest()->first();
+      
+
+        $this->logs = Log::when($this->dayRecord, function($query){
+                        $query->whereHas('login', function($query){
+                            $query->where('day_record_id', $this->dayRecord->id);
+                        });
+                        })
+                        ->when($this->department, function($query){
+                            $query->whereHas('login.account.department', function($query){
+                                $query->where('id', $this->department);
+                            });
+                        })
+                        ->when($this->morning, function($query){
+                            $query->whereHas('login', function($query){
+                                $query->whereTime('created_at', '>=', '00:00:00')->whereTime('created_at', '<', '12:00:00');
+                            });
+                        })
+                        ->when($this->noon, function($query){
+                            $query->whereHas('login', function($query){
+                                $query->whereTime('created_at', '>=' ,'12:00:00')->whereTime('created_at', '<', '24:00:00');
+                            });
+                        })
+                        ->when($this->course, function($query){
+                            $query->whereHas('login.account.course', function($query){
+                                $query->where('id', $this->course);
+                            });
+                        })
+                        ->when($this->staff, function($query){
+                            $query->where('role_name', 'staff');
+                        })
+
+                        ->when($this->student, function($query){
+                            $query->where('role_name', 'student');
+                    
+                        })
+                        ->whereHas('login', function($query){
+                            // $query->whereNotNull('noon_in')->whereNotNull('noon_out');
+                            // $query->whereNotNull('morning_in');
+                        })
+                        ->latest()
+                        ->get();
         return view('livewire.manage.manage-report', [
             'departments'=> $this->departments,
             'courses'=> $this->courses,
