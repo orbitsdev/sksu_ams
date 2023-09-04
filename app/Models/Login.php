@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Log;
 use App\Models\Logout;
 use App\Models\Account;
 use App\Models\DayRecord;
@@ -26,5 +27,10 @@ class Login extends Model
 
     public function logout(){
         return $this->hasOne(Logout::class);
+ 
+    }
+
+    public function log(){
+        return $this->hasOne(Log::class);
     }
 }

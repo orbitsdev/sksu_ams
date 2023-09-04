@@ -16,9 +16,12 @@ use App\Models\Department;
 use App\Models\SchoolYear;
 use WireUi\Traits\Actions;
 use Illuminate\Support\Str;
+use App\Exports\AccountExport;
+use App\Imports\AccountToAddImport;
 use Filament\Forms\Components\Grid;
 use Filament\Tables\Actions\Action;
 use Illuminate\Contracts\View\View;
+use Maatwebsite\Excel\Facades\Excel;
 use Filament\Forms\Components\Select;
 use Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Components\Fieldset;
@@ -84,18 +87,19 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
     protected function getTableColumns(): array
     {
         return [
+            TextColumn::make('id')->label('Account ID'),
             ImageColumn::make('profile_path')->disk('public')->height(120)->url(function (Account $record) {
                 return Storage::url($record->profile_path);
             })->openUrlInNewTab()->defaultImageUrl(url('/images/placeholder.png')),
             // Tables\Columns\TextColumn::make('slug'),
             TextColumn::make('id_number')->searchable(),
-            TextColumn::make('Name')->formatStateUsing(fn (Account $record): string => Str::upper($record->first_name. ' '. $record->last_name . ' ,'.$record->middle_name ) )    ->searchable(query: function (Builder $query, string $search): Builder {
+            TextColumn::make('Name')->formatStateUsing(fn (Account $record): string =>  Str::upper($record->first_name. ' '. $record->last_name . ' ,'.$record->middle_name ) )    ->searchable(query: function (Builder $query, string $search): Builder {
                 return $query
                     ->where('first_name', 'like', "%{$search}%")
                     ->orWhere('last_name', 'like', "%{$search}%");
             }),
-            TextColumn::make('role.name')->formatStateUsing(fn (string $state): string => Str::ucfirst($state)),
-            TextColumn::make('department.name')->formatStateUsing(fn (string $state): string => Str::ucfirst($state)),
+            TextColumn::make('role.name')->formatStateUsing(fn (null|string $state): string =>  $state ? Str::ucfirst($state) : ''),
+            TextColumn::make('department.name')->formatStateUsing(fn (null|string $state): string => $state ? Str::ucfirst($state): ''),
            
             // TextColumn::make('course.department.name'),
             // TextColumn::make('')->searchable(),
@@ -396,25 +400,47 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
     protected function getTableHeaderActions(): array
     {
         return [
-            Action::make('Import ')
+            Action::make('Import To Add ')
+            ->icon('heroicon-o-cloud-upload')
+            ->action(function (array $data): void {
+
+                $file  = Storage::disk('public')->path($data['file']);
+           
+                Excel::import(new AccountToAddImport, $file);
+    
+                if (Storage::disk('public')->exists($data['file'])) {
+    
+                    Storage::disk('public')->delete($data['file']);
+    
+                }
+        })->icon('heroicon-o-save')->form([
+            FileUpload::make('file')->acceptedFileTypes(['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/csv', 'text/csv', 'text/plain'])->disk('public')->directory('imports')->label('Excel File'),
+        ])
+         ->modalHeading('Import To Update')
+         ->modalSubheading('The system is case sensitive, Make Sure the data that you put int the excel is exist in the system as well as the spelling is correct ')
+         ->modalSubheading('Are you sure you\'d like to delete these posts? This cannot be undone.')
+         ,
+            Action::make('Import for update')
             ->icon('heroicon-o-cloud-upload')
             ->action(function (array $data): void {
 
             // $file  = Storage::disk('public')->path($data['file']);
            
-            // Excel::import(new CampusImport, $file);
+            // Excel::import(new AccountToAddImport, $file);
 
             // if (Storage::disk('public')->exists($data['file'])) {
 
             //     Storage::disk('public')->delete($data['file']);
+
             // }
+            
         })->icon('heroicon-o-save')->form([
             FileUpload::make('file')->acceptedFileTypes(['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/csv', 'text/csv', 'text/plain'])->disk('public')->directory('imports')->label('Excel File'),
         ]) ->modalHeading('Notice'),
             Action::make('download')->icon('heroicon-s-download')->label('Download Template ')
             ->action(function(){
 
-                // return Excel::download(new CampusExport, 'campus_template.xlsx');
+                return Excel::download(new AccountExport, 'accounts.xlsx');
                 // return Excel::download(new CampusExport, 'campus_template.xlsx');
             })
             ->requiresConfirmation()
@@ -425,7 +451,7 @@ class ManageAccount extends Component implements Tables\Contracts\HasTable, Form
             Keep in mind that attempting to assign names to campuses, departments, or sections that do not exist will not be saved. Moreover, modifying the structure could lead to errors when importing the data into the system.
             
             If you have any questions or need assistance, feel free to reach out. We're here to help!")
-            ->modalButton('Ok, Download'),
+            ->modalButton('Download'),
                
                 
             // Tables\Actions\ActionGroup::make([

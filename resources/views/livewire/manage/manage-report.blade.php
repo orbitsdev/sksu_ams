@@ -162,7 +162,7 @@
                                         @if (optional($item->login)->morning_out)
                                             {{ \Carbon\Carbon::parse($item->login->morning_out)->format('h:i:s A') }}
                                         @elseif (!$item->created_at->isToday())
-                                            Did not login
+                                            Did not logout
                                         @else
                                             NONE
                                         @endif
@@ -179,7 +179,7 @@
                                         @if (optional($item->login)->noon_out)
                                             {{ \Carbon\Carbon::parse($item->login->noon_out)->format('h:i:s A') }}
                                         @elseif (!$item->created_at->isToday())
-                                            Did not login
+                                            Did not logout
                                         @else
                                             NONE
                                         @endif

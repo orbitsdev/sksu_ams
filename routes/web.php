@@ -72,6 +72,7 @@ Route::middleware([ 'auth:sanctum',  config('jetstream.auth_session'), 'verified
         Route::get('/manage-staffs', function () {  return view('manage.staffs');  })->name('staffs');
         Route::get('/manage-accounts', function () {  return view('manage.accounts');  })->name('accounts');
         Route::get('/manage-users', function () {  return view('manage.users');  })->name('users');
+        Route::get('/manage-logs', function () {  return view('manage.logs');  })->name('logs');
     });
 
 
